@@ -1,0 +1,9 @@
+<p>chat works!</p>
+<div>
+    <div *ngFor='let message of messages'>
+        <br/>
+        <label>{{message.id}}</label>
+        <br/>
+        <p><label>{{message.time.toUTCString()}}</label>: {{message.message}}</p>
+    </div>
+</div>
