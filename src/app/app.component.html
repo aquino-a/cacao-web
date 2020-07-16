@@ -1,5 +1,15 @@
-
-<div class="container">
-    <app-friend-list></app-friend-list>
-    <router-outlet></router-outlet>
+<nav class="navbar navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="#">
+        <img src="" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
+        Cacao
+    </a>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <!-- <app-friend-list class="float-left px-3 position-fixed col-3" style="overflow: scroll; height: 100%;"></app-friend-list> -->
+        <app-friend-list class="col-2 sidebar-sticky"></app-friend-list>
+        <main class="col-9 h-100" style="overflow: scroll;">
+            <router-outlet ></router-outlet>
+        </main>
+    </div>
 </div>

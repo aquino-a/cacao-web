@@ -1,6 +1,6 @@
 <p>friend-list works!</p>
 <div>
-    <div *ngFor="let friend of friendList">
-        <img src="{{friend.user.imgUrl}}" />
+    <div *ngFor="let friend of friendList" class="py-2" data-toggle="tooltip" data-html="true" title="{{friend.user.realName}}" routerLink="/chat/{{friend.user.id}}"> 
+        <img class="rounded" src="{{friend.user.imgUrl}}" />
     </div>
 </div>

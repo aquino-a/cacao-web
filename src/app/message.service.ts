@@ -7,7 +7,20 @@ import { Observable, of } from 'rxjs';
 export class MessageService {
   
   newMessage = new EventEmitter<Message>();
-  private messages = new Map<string, Message[]>().set('1', [{id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true }]);
+  private messages = new Map<string, Message[]>().set('1', [
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+    {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '123', toUser:'1444',wasRead:true },
+  ]);
   
   constructor() { }
   
