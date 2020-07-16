@@ -4,11 +4,10 @@
         Cacao
     </a>
 </nav>
-<div class="container-fluid">
-    <div class="row">
-        <!-- <app-friend-list class="float-left px-3 position-fixed col-3" style="overflow: scroll; height: 100%;"></app-friend-list> -->
-        <app-friend-list class="col-2 sidebar-sticky"></app-friend-list>
-        <main class="col-9 h-100" style="overflow: scroll;">
+<div>
+    <div>
+        <app-friend-list class="sidebar"></app-friend-list>
+        <main class="container">
             <router-outlet ></router-outlet>
         </main>
     </div>
