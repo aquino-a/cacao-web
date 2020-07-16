@@ -1,12 +1,12 @@
 <p>chat works!</p>
 <div>
-    <div *ngFor='let message of messages'>
+    <div id="messages" *ngFor='let message of messages'>
         <br/>
         <label>{{message.id}}</label>
         <br/>
         <p><label>{{message.time.toUTCString()}}</label>: {{message.message}}</p>
     </div>
-    <div class="" style="height: 60px; background-color: royalblue;">
+    <div id="newMessageWrapper">
         hello
     </div>
 </div>
