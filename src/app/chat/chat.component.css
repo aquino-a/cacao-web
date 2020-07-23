@@ -1,8 +1,28 @@
+.message-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    border-radius: 16px;
+    padding: 1em;
+    flex-basis: 100%;
+}
+
+.myMessage {
+    background-color: yellow;
+    /* float: right; */
+}
+
+.otherMessage {
+    background-color: lightblue;
+    /* float: left; */
+}
+
 #messages {
     position: relative;
     bottom: 6%;
 }
-
 
 #newMessageWrapper {
     position: fixed;
