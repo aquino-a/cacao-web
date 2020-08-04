@@ -3,8 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
 
-declare function require(name:string);
-var jose = require('jose');
 
 @Injectable({
   providedIn: 'root'
@@ -39,10 +37,22 @@ export class AuthenticationService {
   }
 
   private setUser(idToken: string) {
-    var decodedJwt = jose.decode(idToken);
-    var userData = decodedJwt.payload as GoogleData;
-    this.currentUser = { email: userData.email, id: userData.sub, imgUrl: userData.picture, realName: userData.name };
+    this.currentUser = this.jwtToUser(idToken);
     this.userLoginSuccess.emit(this.currentUser);
+  }
+
+  jwtToUser(idToken: string): User {
+    var userData = this.getPayload<GoogleData>(idToken);
+    return { email: userData.email, id: userData.sub, imgUrl: userData.picture, realName: userData.name };
+  }
+
+  getPayload<T>(jwt: string): T {
+
+    var jwtPieces = jwt.split('.', 2);
+    if(jwtPieces.length != 2){
+      throw new Error("Must be string with one or more periods");
+    }
+    return JSON.parse(atob(jwtPieces[1])) as T;
   }
 
 }
