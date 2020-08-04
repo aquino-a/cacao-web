@@ -3,6 +3,16 @@
         <img src="" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
         Cacao
     </a>
+    <div *ngIf="currentUser; else elseBlock">
+        <a>
+            <img src="{{currentUser.imgUrl}}" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
+        </a>
+    </div>
+    <ng-template #elseBlock>
+        <a routerLink="/login">
+            Login
+        </a>
+    </ng-template>
 </nav>
 <div>
     <div>

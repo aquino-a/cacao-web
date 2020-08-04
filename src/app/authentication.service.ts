@@ -2,6 +2,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 
 @Injectable({
@@ -13,10 +14,11 @@ export class AuthenticationService {
   tokens: Tokens;
   currentUser: User = { email: "john@gmail.com", id: "1234", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" };
 
-  userLoginSuccess = new EventEmitter<User>(true);
-  userLoginFail = new EventEmitter<any>(true);
+  private userLoginSuccessSource = new Subject<User>();
+  private userLoginFailSource = new Subject<any>();
   
-  
+  userLoginSuccess$ = this.userLoginSuccessSource.asObservable();
+  userLoginFail$ = this.userLoginFailSource.asObservable();
 
 
   constructor(private http: HttpClient) { 
@@ -32,13 +34,15 @@ export class AuthenticationService {
         this.setUser(this.tokens.idToken);
         console.log(tokens);
       }, error =>{
+        this.currentUser = null;
+        this.userLoginFailSource.next();
         console.log(error);
       });
   }
 
   private setUser(idToken: string) {
     this.currentUser = this.jwtToUser(idToken);
-    this.userLoginSuccess.emit(this.currentUser);
+    this.userLoginSuccessSource.next(this.currentUser);
   }
 
   jwtToUser(idToken: string): User {
