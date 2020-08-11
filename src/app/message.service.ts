@@ -1,5 +1,6 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,9 @@ export class MessageService {
     {id: '8W8W', message: 'here\'s johnnie',time: new Date('2020-07-13T10:43:28.7500592'),fromUser: '1234', toUser:'1444',wasRead:true },
   ]);
   
-  constructor() { }
+  constructor(private authenticationService: AuthenticationService) {
+    
+   }
   
   fetchMessages(chatId: string): Observable<Message[]> {
     return of(this.messages.get('1'));

@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { isNull } from '@angular/compiler/src/output/output_ast';
 
 
 @Injectable({
@@ -12,7 +13,7 @@ export class AuthenticationService {
   
   baseUrl = environment.baseUrl;
   tokens: Tokens;
-  currentUser: User = { email: "john@gmail.com", id: "1234", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" };
+  currentUser: User;
 
   private userLoginSuccessSource = new Subject<User>();
   private userLoginFailSource = new Subject<any>();
@@ -57,6 +58,10 @@ export class AuthenticationService {
       throw new Error("Must be string with one or more periods");
     }
     return JSON.parse(atob(jwtPieces[1])) as T;
+  }
+
+  isAuthenticated() {
+    return this.currentUser != null;
   }
 
 }
