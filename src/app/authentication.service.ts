@@ -3,7 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { isNull } from '@angular/compiler/src/output/output_ast';
+import { isNull, ThrowStmt } from '@angular/compiler/src/output/output_ast';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -15,15 +16,34 @@ export class AuthenticationService {
   tokens: Tokens;
   currentUser: User;
 
-  private userLoginSuccessSource = new Subject<User>();
+  private userLoginSuccessSource = new BehaviorSubject<User>(null);
   private userLoginFailSource = new Subject<any>();
   
   userLoginSuccess$ = this.userLoginSuccessSource.asObservable();
   userLoginFail$ = this.userLoginFailSource.asObservable();
 
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient, private router: Router) {
+     
+  }
 
+  load(): Promise<any> {
+    return new Promise((resolve) =>{
+      if(localStorage.tokens != null){
+        var localTokens = JSON.parse(localStorage.tokens) as Tokens;
+        if(this.notExpired(localTokens.idToken)){
+          this.tokens = localTokens;
+          this.setUser(this.tokens.idToken);
+        }
+      }
+      resolve();
+    }).catch(error => console.log(error));
+  }
+
+  notExpired(jwtToken: string): boolean {
+    var payload = this.getPayload<GoogleData>(jwtToken);
+    var expDate = new Date(Number.parseInt(payload.exp) * 1000);
+    return Date.now() < expDate.getTime();
   }
   
   authenticate(code: string) {
@@ -33,13 +53,17 @@ export class AuthenticationService {
       }).subscribe(tokens => {
         this.tokens = tokens;
         this.setUser(this.tokens.idToken);
+        localStorage.tokens = JSON.stringify(this.tokens);
         console.log(tokens);
+        this.router.navigate(['']);
       }, error =>{
         this.currentUser = null;
         this.userLoginFailSource.next();
         console.log(error);
+        this.router.navigate(['login']);
       });
   }
+
 
   private setUser(idToken: string) {
     this.currentUser = this.jwtToUser(idToken);
@@ -86,6 +110,7 @@ interface GoogleData {
   name: string;
   picture: string;
   sub: string;
+  exp: string;
 }
 
 export interface Tokens {
