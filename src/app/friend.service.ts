@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, Pipe } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
 
@@ -15,7 +16,10 @@ export class FriendService {
    }
   
   fetchFriendList(): Observable<Friend[]> {
-    return this.http.get<Friend[]>(environment.baseUrl + "/api/friends");
+    return this.http.get<User[]>(environment.baseUrl + "/api/friends")
+        .pipe(map(users => users.map(u => {
+          return { user: u, unreadMessages: 0 };
+        })));
   }
 
   addFriend(email: string){
