@@ -9,6 +9,8 @@ import { LoginComponent } from './login/login.component';
 import { ChatComponent, MessageComponent } from './chat/chat.component';
 import { AuthGuard } from './auth.guard';
 import { AuthenticationService } from './authentication.service';
+import { httpInterceptorProviders } from './interceptors/index'
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -21,7 +23,8 @@ import { AuthenticationService } from './authentication.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [
     AuthGuard,
@@ -35,7 +38,8 @@ import { AuthenticationService } from './authentication.service';
       },
       deps:[AuthenticationService],
       multi: true
-    }
+    },
+    httpInterceptorProviders
   ],
   bootstrap: [AppComponent]
 })

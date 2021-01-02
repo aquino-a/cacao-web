@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { User } from './user';
 
 @Injectable({
@@ -8,37 +10,18 @@ export class FriendService {
   
   friendList: Friend[];
   
-  constructor() {
+  constructor(private http: HttpClient) {
     console.log('in friendservice init');
-    this.friendList = [
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 2},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 4},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 0},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 22},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-      { user: { email: "john@gmail.com", id: "123", imgUrl: "https://lh3.googleusercontent.com/ogw/ADGmqu-JMRosn04hKyKrbDQBwqHnpZZw9ZBq6tf19tA=s32-c-mo", realName: "Johnnie" }, unreadMessages: 123},
-    ];
    }
   
   fetchFriendList(): Friend[] {
     console.log(this.friendList);
     return this.friendList;
+  }
+
+  addFriend(email: string){
+    this.http.post(environment.baseUrl + "/friends/add", {"email": email})
+      .subscribe(data => console.log(data));
   }
   
 }

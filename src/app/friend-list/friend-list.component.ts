@@ -8,7 +8,9 @@ import { FriendService, Friend } from '../friend.service';
 })
 export class FriendListComponent implements OnInit {
 
-  constructor(private friendService: FriendService) {
+  addEmail: string = '';
+
+  constructor(public friendService: FriendService) {
   }
   
   friendList: Friend[];
