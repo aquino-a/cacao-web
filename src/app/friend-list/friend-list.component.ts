@@ -16,8 +16,13 @@ export class FriendListComponent implements OnInit {
   friendList: Friend[];
   
   ngOnInit(): void {
-    this.friendList = this.friendService.fetchFriendList();
+    this.getFriendList();
     console.log(this.friendList);
+  }
+
+  getFriendList(){
+    this.friendService.fetchFriendList()
+      .subscribe(fs => { console.log(fs); this.friendList = fs; }, error => console.log(error));
   }
 
 }
