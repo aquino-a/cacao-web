@@ -1,7 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
-import { over } from "@stomp/stompjs";
+import { Client, IFrame } from "@stomp/stompjs";
 import * as SockJS from 'sockjs-client';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -11,7 +11,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 })
 export class MessageService {
   
-  private stompClient; 
+  private stompClient: Client;
 
   private messages = new Map<string, Message[]>();
 
@@ -29,18 +29,39 @@ export class MessageService {
   createStompClient(): void {
     if(!this.auth.isAuthenticated())
       return;
+      
+    this.stompClient = new Client({
+        debug: function (str) {
+          console.log(str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+        webSocketFactory: () => new SockJS(environment.baseUrl + '/api/ws')
+      });
 
-    const socket = new SockJS(environment.baseUrl + '/api/ws');
-    this.stompClient = over(socket);
-
-    this.stompClient.connect({}, (frame) =>{
-      console.log('Connected: ' + frame);
-      this.setConnected(true);
-      this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
-    });
+    this.stompClient.onConnect = this.onConnect;
+    this.stompClient.onStompError = this.onStompError;
+    
+    this.stompClient.activate();
   }
 
-  processNewMessage(arg0: string, data: any) {
+  onConnect(frame: IFrame){
+    console.log('Connected: ' + frame);
+    this.setConnected(true);
+    this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
+  }
+
+  onStompError(frame: IFrame){
+      // Will be invoked in case of error encountered at Broker
+      // Bad login/passcode typically will cause an error
+      // Complaint brokers will set `message` header with a brief message. Body may contain details.
+      // Compliant brokers will terminate the connection after any error
+      console.log('Broker reported error: ' + frame.headers['message']);
+      console.log('Additional details: ' + frame.body);
+  }
+
+  processNewMessage(data: any) {
     const message = JSON.parse(data.body) as Message;
 
     this.newMessageSource.next(message);
