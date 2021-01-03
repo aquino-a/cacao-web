@@ -12,8 +12,7 @@ export class FriendService {
   
   
   constructor(private http: HttpClient) {
-    console.log('in friendservice init');
-   }
+  }
   
   fetchFriendList(): Observable<Friend[]> {
     return this.http.get<User[]>(environment.baseUrl + "/api/friends")

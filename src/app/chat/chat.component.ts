@@ -21,6 +21,7 @@ export class ChatComponent implements OnInit {
     ) { 
       authenticationService.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       authenticationService.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
+      messageService.newMessage$.subscribe({next: message => this.messages.push(message)});
     }
 
   ngOnInit(): void {
