@@ -21,10 +21,11 @@ export class FriendService {
         })));
   }
 
-  addFriend(email: string){
+  addFriend(email: string): Observable<Object>{
     const options = { params: new HttpParams().set("email", email) };
-    this.http.post(environment.baseUrl + "/api/friend/add", null, options)
-      .subscribe(data => console.log(data), error => console.log(error));
+    const ob = this.http.post(environment.baseUrl + "/api/friend/add", null, options);
+    ob.subscribe(data => console.log(data), error => console.log(error));
+    return ob;
   }
   
 }

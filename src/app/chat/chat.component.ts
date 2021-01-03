@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
+import { isDefined } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-chat',
@@ -21,7 +22,7 @@ export class ChatComponent implements OnInit {
     ) { 
       authenticationService.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       authenticationService.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
-      messageService.newMessage$.subscribe({next: message => this.messages.push(message)});
+      messageService.newMessage$.subscribe({next: message => { if(isDefined(this.messages)) this.messages.push(message); } });
     }
 
   ngOnInit(): void {

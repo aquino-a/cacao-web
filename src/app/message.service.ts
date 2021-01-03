@@ -19,6 +19,7 @@ export class MessageService {
   newMessage$ = this.newMessageSource.asObservable();
   
   constructor(private auth: AuthenticationService, private http: HttpClient) {
+    this.createStompClient();
   }
   
   setupAuthenticationEvents() {
@@ -37,7 +38,7 @@ export class MessageService {
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
-        webSocketFactory: () => new SockJS(environment.baseUrl + '/api/ws')
+        webSocketFactory: () => new SockJS(environment.baseUrl + '/api/ws?token=' + this.auth.tokens.idToken)
       });
 
     this.stompClient.onConnect = this.onConnect;
@@ -84,7 +85,7 @@ export class MessageService {
       params: 
         new HttpParams()
           .set("userId2", chatId)
-          .set("earlierThan", Date.now.toString())
+          .set("earlierThan", (new Date()).toISOString())
     };
     var ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
 
