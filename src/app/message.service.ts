@@ -38,7 +38,7 @@ export class MessageService {
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
-        webSocketFactory: () => new SockJS(environment.baseUrl + '/api/ws?token=' + this.auth.tokens.idToken)
+        webSocketFactory: () => new SockJS(environment.baseUrl + '/api/ws?access_token=' + this.auth.tokens.idToken)
       });
 
     this.stompClient.onConnect = this.onConnect;
