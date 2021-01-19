@@ -16,7 +16,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
       if(!this.auth.isAuthenticated())
         return next.handle(req);
       const authReq = req.clone({
-          params: req.params.set("access_token", this.auth.tokens.idToken)
+          headers: req.headers.set("Authorization", "Bearer " + this.auth.tokens.idToken)
       })
       return next.handle(authReq);
   }
