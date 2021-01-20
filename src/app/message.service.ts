@@ -1,16 +1,17 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { AuthenticationService } from './authentication.service';
 import { Client, IFrame } from "@stomp/stompjs";
 import * as SockJS from 'sockjs-client';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
+import { AuthenticationService } from './authentication.service';
+
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
-  
+ 
   private stompClient: Client;
 
   private messages = new Map<string, Message[]>();
@@ -47,7 +48,7 @@ export class MessageService {
     this.stompClient.activate();
   }
 
-  onConnect(frame: IFrame){
+  onConnect = (frame: IFrame) => {
     console.log('Connected: ' + frame);
     this.setConnected(true);
     this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
@@ -62,14 +63,21 @@ export class MessageService {
       console.log('Additional details: ' + frame.body);
   }
 
-  processNewMessage(data: any) {
-    const message = JSON.parse(data.body) as Message;
+  processNewMessage = (data: any) => {
+    const message = JSON.parse(data.body, this.messageParse) as Message;
 
     this.newMessageSource.next(message);
 
     if(this.messages.has(message.fromUser))
       this.messages.get(message.fromUser).push(message);
     else this.messages.set(message.fromUser, [message]);
+  }
+
+  messageParse(key: any, value: any) {
+    if(key == 'time'){
+      return new Date(value);
+    }
+    return value;
   }
 
   setConnected(isConnected: boolean) {
@@ -91,6 +99,20 @@ export class MessageService {
 
     ob.subscribe(messages => this.messages.set(chatId, messages));
     return ob;
+  }
+
+  send(toUser: string, newMessage: string) {
+    var message = {
+      toUser: toUser,
+      message: newMessage
+    };
+
+    var params = {
+      destination: "/api/app/message/send",
+      body: JSON.stringify(message)
+    };
+
+    this.stompClient.publish(params);
   }
 }
 

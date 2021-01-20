@@ -15,6 +15,6 @@
             </ng-template>
     </div>   
     <div id="newMessageWrapper">
-        <input type="text" style="width: 100%;"/>
+        <input #newMessage type="text" style="width: 100%;" (keyup.enter)="send(newMessage.value); newMessage.value = '';"/>
     </div>
 </div>

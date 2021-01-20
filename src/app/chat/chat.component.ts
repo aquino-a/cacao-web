@@ -34,6 +34,9 @@ export class ChatComponent implements OnInit {
       });
   }
 
+  send(newMessage: string){
+    this.messageService.send(this.chatId, newMessage);
+  }
 }
 
 @Component({
