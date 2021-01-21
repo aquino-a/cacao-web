@@ -4,6 +4,7 @@ import { Client, IFrame } from "@stomp/stompjs";
 import * as SockJS from 'sockjs-client';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 import { AuthenticationService } from './authentication.service';
 
@@ -25,7 +26,7 @@ export class MessageService {
   
   setupAuthenticationEvents() {
     this.auth.userLoginSuccess$.subscribe({next: user => this.createStompClient()});
-    this.auth.userLoginFail$.subscribe({next: nothing => this.stompClient = null});
+    this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect(); this.stompClient = null;}});
   }
 
   createStompClient(): void {
@@ -94,11 +95,19 @@ export class MessageService {
         new HttpParams()
           .set("userId2", chatId)
           .set("earlierThan", (new Date()).toISOString())
+          
     };
-    var ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
+    const ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
 
-    ob.subscribe(messages => this.messages.set(chatId, messages));
-    return ob;
+    const pipedOb = ob.pipe(map(ms => {
+      ms.forEach(m =>
+      {
+        m.time = new Date(m.time + 'Z');
+      });
+      return ms;
+    }));
+    pipedOb.subscribe(messages => this.messages.set(chatId, messages));
+    return pipedOb;
   }
 
   send(toUser: string, newMessage: string) {
