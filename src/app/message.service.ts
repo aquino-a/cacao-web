@@ -75,7 +75,7 @@ export class MessageService {
 
   messageParse(key: any, value: any) {
     if(key == 'time'){
-      return new Date(value);
+      return new Date(value + 'Z');
     }
     return value;
   }
