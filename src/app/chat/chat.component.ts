@@ -12,17 +12,17 @@ import { isDefined } from '@angular/compiler/src/util';
 export class ChatComponent implements OnInit {
 
   chatId: string;
-  messages: Message[];
+  messages: Set<Message>;
   currentUserId: string;
 
   constructor(
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private authenticationService: AuthenticationService
+    private auth: AuthenticationService
     ) { 
-      authenticationService.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
-      authenticationService.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
-      messageService.newMessage$.subscribe({next: message => { if(isDefined(this.messages)) this.messages.push(message); } });
+      auth.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
+      auth.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
+      messageService.newMessage$.subscribe({next: this.newMessage });
     }
 
   ngOnInit(): void {
@@ -30,12 +30,32 @@ export class ChatComponent implements OnInit {
     this.messageService
       .fetchMessages(this.chatId)
       .subscribe(messages =>{
-        this.messages = messages;
+        this.messages = new Set<Message>(messages);
       });
+  }
+
+  newMessage = (message: Message) => {
+    if(!isDefined(this.messages) || !isDefined(message)){ 
+      return;  
+    }
+
+    if(message.fromUser != this.chatId && message.toUser != this.chatId){
+      return;
+    }
+
+    this.messages.add(message); 
+    if(message.toUser == this.auth.currentUser.id){
+      this.read(message);
+    }
+
   }
 
   send(newMessage: string){
     this.messageService.send(this.chatId, newMessage);
+  }
+
+  read(message: Message){
+    this.messageService.readMessage(message);
   }
 }
 

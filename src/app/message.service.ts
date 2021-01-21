@@ -12,10 +12,10 @@ import { AuthenticationService } from './authentication.service';
   providedIn: 'root'
 })
 export class MessageService {
- 
+  
   private stompClient: Client;
 
-  private messages = new Map<string, Message[]>();
+  private messages = new Map<string, Set<Message>>();
 
   private newMessageSource = new BehaviorSubject<Message>(null);
   newMessage$ = this.newMessageSource.asObservable();
@@ -69,9 +69,11 @@ export class MessageService {
 
     this.newMessageSource.next(message);
 
-    if(this.messages.has(message.fromUser))
-      this.messages.get(message.fromUser).push(message);
-    else this.messages.set(message.fromUser, [message]);
+    if(this.messages.has(message.fromUser)){
+      var ms = this.messages.get(message.fromUser);
+      ms.add(message);
+    }
+    else this.messages.set(message.fromUser, new Set<Message>().add(message));
   }
 
   messageParse(key: any, value: any) {
@@ -86,7 +88,7 @@ export class MessageService {
       console.log('Connected');
   }
   
-  fetchMessages(chatId: string): Observable<Message[]> {
+  fetchMessages(chatId: string): Observable<Set<Message>> {
     if(this.messages.has(chatId))
       return of(this.messages.get(chatId));
 
@@ -104,7 +106,7 @@ export class MessageService {
       {
         m.time = new Date(m.time + 'Z');
       });
-      return ms;
+      return new Set(ms);
     }));
     pipedOb.subscribe(messages => this.messages.set(chatId, messages));
     return pipedOb;
@@ -123,6 +125,15 @@ export class MessageService {
 
     this.stompClient.publish(params);
   }
+
+  readMessage(message: Message) {
+    var params = {
+      destination: "/api/app/message/read",
+      body: message.id
+    };
+    this.stompClient.publish(params);
+  }
+ 
 }
 
 export interface Message {
