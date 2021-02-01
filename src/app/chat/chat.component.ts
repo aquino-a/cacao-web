@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
@@ -10,7 +10,9 @@ import { isDefined } from '@angular/compiler/src/util';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-
+ 
+  @ViewChild('messageContainer') private messageContainer: ElementRef;
+  
   chatId: string;
   messages: Set<Message>;
   currentUserId: string;
@@ -43,7 +45,8 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.messages.add(message); 
+    this.messages.add(message);
+    this.scrollToBottom();
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -57,6 +60,15 @@ export class ChatComponent implements OnInit {
   read(message: Message){
     this.messageService.readMessage(message);
   }
+
+  scrollToBottom() {
+    try {
+      this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+    } catch(error) {
+      console.log(error);
+    }  
+  }
+
 }
 
 @Component({

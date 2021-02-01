@@ -1,6 +1,8 @@
 .message-container {
     display: flex;
     flex-direction: column;
+    overflow: auto;
+    max-height: 95vh;
 }
 
 .message {
