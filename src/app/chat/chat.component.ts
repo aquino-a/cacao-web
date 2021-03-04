@@ -29,12 +29,14 @@ export class ChatComponent implements OnInit {
     }
 
   ngOnInit(): void {
-    this.chatId = this.route.snapshot.paramMap.get('id');
-    this.messageService
-      .fetchMessages(this.chatId)
-      .subscribe(messages =>{
-        this.messages = new Set<Message>(messages);
-      });
+    this.route.params.subscribe(p =>{
+      this.chatId = this.route.snapshot.paramMap.get('id');
+      this.messageService
+        .fetchMessages(this.chatId)
+        .subscribe(messages =>{
+          this.messages = new Set<Message>(messages);
+        });
+    });
   }
 
   ngAfterViewInit() {
