@@ -69,11 +69,20 @@ export class MessageService {
 
     this.newMessageSource.next(message);
 
-    if(this.messages.has(message.fromUser)){
-      var ms = this.messages.get(message.fromUser);
+    const chatId = this.getChatId(message);
+    if(this.messages.has(chatId)){
+      var ms = this.messages.get(chatId);
       ms.add(message);
     }
-    else this.messages.set(message.fromUser, new Set<Message>().add(message));
+    else this.messages.set(chatId, new Set<Message>().add(message));
+  }
+
+  getChatId(message: Message): string {
+    if(message.fromUser == this.auth.currentUser.id){
+      return message.toUser;
+    } else {
+      return message.fromUser;
+    }
   }
 
   messageParse(key: any, value: any) {
