@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, QueryList, ViewChildren, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
@@ -11,7 +11,8 @@ import { isDefined } from '@angular/compiler/src/util';
 })
 export class ChatComponent implements OnInit {
  
-  @ViewChild('messageContainer') private messageContainer: ElementRef;
+  @ViewChildren('messageContainer') private messageContainer: QueryList<ElementRef>;
+  @ViewChild('messageContainer') private messageContainerChild: ElementRef;
   
   chatId: string;
   messages: Set<Message>;
@@ -36,6 +37,10 @@ export class ChatComponent implements OnInit {
       });
   }
 
+  ngAfterViewInit() {
+    this.messageContainer.changes.subscribe(this.scrollToBottom);
+  }
+
   newMessage = (message: Message) => {
     if(!isDefined(this.messages) || !isDefined(message)){ 
       return;  
@@ -46,7 +51,6 @@ export class ChatComponent implements OnInit {
     }
 
     this.messages.add(message);
-    this.scrollToBottom();
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -61,9 +65,9 @@ export class ChatComponent implements OnInit {
     this.messageService.readMessage(message);
   }
 
-  scrollToBottom() {
+  scrollToBottom = () => {
     try {
-      this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+      this.messageContainerChild.nativeElement.scrollTop = this.messageContainerChild.nativeElement.scrollHeight;
     } catch(error) {
       console.log(error);
     }  
