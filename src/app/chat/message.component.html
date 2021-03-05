@@ -1,0 +1,8 @@
+<div class="row"  [class.justify-content-end]='isUser' [class.justify-content-start]='!isUser'>
+    <div class="message col-5" [class.myMessage]='isUser' [class.otherMessage]='!isUser'>
+        <label>{{message.id}}</label>
+        <br/>
+        <label>{{message.time.toLocaleString()}}</label>
+        <p>{{message.message}}</p>
+    </div>
+</div>

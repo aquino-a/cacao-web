@@ -1,6 +1,7 @@
 <div class="message-container" #messageContainer>
     <div id="messages" *ngFor='let message of messages'>
-            <div class="row justify-content-end" *ngIf="message.fromUser == currentUserId ; else elseBlock">
+        <app-message [message]="message" [isUser]='message.fromUser == currentUserId'></app-message>
+            <!-- <div class="row justify-content-end" *ngIf="message.fromUser == currentUserId ; else elseBlock">
                 <div class="message myMessage col-5">
                     <app-message [message] = "message"></app-message>
                 </div>
@@ -11,7 +12,7 @@
                         <app-message [message] = "message"></app-message>
                     </div>
                 </div>
-            </ng-template>
+            </ng-template> -->
     </div>   
     <div id="newMessageWrapper">
         <input #newMessage type="text" style="width: 100%;" (keyup.enter)="send(newMessage.value); newMessage.value = '';"/>

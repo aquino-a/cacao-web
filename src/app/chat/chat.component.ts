@@ -79,13 +79,9 @@ export class ChatComponent implements OnInit {
 
 @Component({
   selector: 'app-message',
-  template: `
-    <label>{{message.id}}</label>
-    <br/>
-    <label>{{message.time.toUTCString()}}</label>
-    <p>{{message.message}}</p>
-`
+  templateUrl: './message.component.html'
 })
 export class MessageComponent {
   @Input() message: Message;
+  @Input() isUser: boolean;
 }
