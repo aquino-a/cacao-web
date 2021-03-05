@@ -4,7 +4,7 @@
         Cacao
     </a>
     <div *ngIf="currentUser; else elseBlock">
-        <a>
+        <a (click)="auth.logout()">
             <img src="{{currentUser.imgUrl}}" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
         </a>
     </div>

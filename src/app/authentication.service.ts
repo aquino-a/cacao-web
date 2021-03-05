@@ -57,10 +57,8 @@ export class AuthenticationService {
         console.log(tokens);
         this.router.navigate(['']);
       }, error =>{
-        this.currentUser = null;
-        this.userLoginFailSource.next();
+        this.logout();
         console.log(error);
-        this.router.navigate(['login']);
       });
   }
 
@@ -88,23 +86,15 @@ export class AuthenticationService {
     return this.currentUser != null;
   }
 
+  logout(){
+    this.currentUser = null;
+    localStorage.tokens = null;
+    this.userLoginFailSource.next();
+    this.router.navigate(['login']);
+  }
+
 }
 
-
-// "iss": "https://accounts.google.com",
-//   "azp": "407408718192.apps.googleusercontent.com",
-//   "aud": "407408718192.apps.googleusercontent.com",
-//   "sub": "114802719992795296332",
-//   "email": "blackterrapin@gmail.com",
-//   "email_verified": true,
-//   "at_hash": "tYN0svt3cAO3ySC3XxaOKQ",
-//   "name": "Alex Aquino",
-//   "picture": "https://lh3.googleusercontent.com/a-/AOh14Gi36ziLTB7gCY2ejEUQpqN4a5-Jb1Wt0H-KgTE=s96-c",
-//   "given_name": "Alex",
-//   "family_name": "Aquino",
-//   "locale": "en",
-//   "iat": 1596205013,
-//   "exp": 1596208613
 interface GoogleData {
   email: string;
   name: string;

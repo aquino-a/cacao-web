@@ -12,13 +12,13 @@ export class AppComponent {
   currentUser: User;
 
 
-  constructor(private authenticationService: AuthenticationService){
-    authenticationService.userLoginSuccess$.subscribe({
+  constructor(public auth: AuthenticationService){
+    auth.userLoginSuccess$.subscribe({
       next: user => {
         this.currentUser = user;
       }
     });
-    authenticationService.userLoginFail$.subscribe({
+    auth.userLoginFail$.subscribe({
       next: nothing => {
         this.currentUser = null;
       }
