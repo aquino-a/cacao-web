@@ -11,7 +11,7 @@ import { isDefined } from '@angular/compiler/src/util';
 })
 export class ChatComponent implements OnInit {
  
-  @ViewChildren('messageContainer') private messageContainer: QueryList<ElementRef>;
+  @ViewChildren('messages') private messageContainer: QueryList<ElementRef>;
   @ViewChild('messageContainer') private messageContainerChild: ElementRef;
   
   chatId: string;

@@ -1,5 +1,5 @@
-<div class="message-container" #messageContainer>
-    <div id="messages" *ngFor='let message of messages; index as i; first as isFirst'>
+<div class="message-container" #messageContainer >
+    <div #messages id="messages" *ngFor='let message of messages; index as i; first as isFirst'>
         <app-message [message]="message" [isUser]='message.fromUser == currentUserId' [isNewDate]="isFirst || isNewDate(i)" [isNewTime]="isNewTime(i)" ></app-message>
     </div>   
     <div id="newMessageWrapper">
