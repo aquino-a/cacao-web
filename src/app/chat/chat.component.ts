@@ -15,7 +15,7 @@ export class ChatComponent implements OnInit {
   @ViewChild('messageContainer') private messageContainerChild: ElementRef;
   
   chatId: string;
-  messages: Set<Message>;
+  messages: Message[];
   currentUserId: string;
 
   constructor(
@@ -34,7 +34,7 @@ export class ChatComponent implements OnInit {
       this.messageService
         .fetchMessages(this.chatId)
         .subscribe(messages =>{
-          this.messages = new Set<Message>(messages);
+          this.messages = messages;
         });
     });
   }
@@ -52,7 +52,7 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.messages.add(message);
+    this.messages.push(message);
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -73,6 +73,28 @@ export class ChatComponent implements OnInit {
     } catch(error) {
       console.log(error);
     }  
+  }
+
+  isNewDate(index: number) : boolean {
+    if(index == 0){
+      return true;
+    }
+    var before = this.messages[index - 1];
+    return before.time.getDate() != this.messages[index].time.getDate();
+  }
+
+  isNewTime(index: number): boolean {
+    if(this.messages.length == index + 1){
+      return true;
+    }
+
+    var current = this.messages[index];
+    var next = this.messages[index + 1];
+
+    if(current.time.getHours() != next.time.getHours()){
+      return true;
+    }
+    else return current.time.getMinutes() != next.time.getMinutes();
   }
 
 }

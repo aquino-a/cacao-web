@@ -15,7 +15,7 @@ export class MessageService {
   
   private stompClient: Client;
 
-  private messages = new Map<string, Set<Message>>();
+  private messages = new Map<string, Message[]>();
 
   private newMessageSource = new BehaviorSubject<Message>(null);
   newMessage$ = this.newMessageSource.asObservable();
@@ -72,9 +72,9 @@ export class MessageService {
     const chatId = this.getChatId(message);
     if(this.messages.has(chatId)){
       var ms = this.messages.get(chatId);
-      ms.add(message);
+      ms.push(message);
     }
-    else this.messages.set(chatId, new Set<Message>().add(message));
+    else this.messages.set(chatId, [message]);
   }
 
   getChatId(message: Message): string {
@@ -97,7 +97,7 @@ export class MessageService {
       console.log('Connected');
   }
   
-  fetchMessages(chatId: string): Observable<Set<Message>> {
+  fetchMessages(chatId: string): Observable<Message[]> {
     if(this.messages.has(chatId))
       return of(this.messages.get(chatId));
 
@@ -115,7 +115,7 @@ export class MessageService {
       {
         m.time = new Date(m.time + 'Z');
       });
-      return new Set(ms);
+      return ms;
     }));
     pipedOb.subscribe(messages => this.messages.set(chatId, messages));
     return pipedOb;
