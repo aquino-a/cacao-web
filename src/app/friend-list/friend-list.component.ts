@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from '../authentication.service';
 import { FriendService, Friend } from '../friend.service';
 
 @Component({
@@ -10,13 +11,13 @@ export class FriendListComponent implements OnInit {
 
   newEmail: string = '';
 
-  constructor(private friendService: FriendService) {
+  constructor(private friendService: FriendService, private auth: AuthenticationService) {
+    auth.userLoginSuccess$.subscribe(u => this.getFriendList());
   }
   
   friendList: Friend[];
   
   ngOnInit(): void {
-    this.getFriendList();
   }
 
   getFriendList(){
