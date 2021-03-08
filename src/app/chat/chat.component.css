@@ -13,11 +13,13 @@
 
 .myMessage {
     background-color: yellow;
+    text-align: right;
     /* float: right; */
 }
 
 .otherMessage {
     background-color: lightblue;
+    text-align: left;
     /* float: left; */
 }
 
@@ -37,4 +39,8 @@
 .row {
     margin-right: 0px;
     margin-left: 0px;
+}
+
+.message-wrapper-user {
+    text-align: end;
 }

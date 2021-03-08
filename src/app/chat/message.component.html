@@ -1,8 +1,10 @@
 <div class="row"  [class.justify-content-end]='isUser' [class.justify-content-start]='!isUser'>
-    <div class="message col-5" [class.myMessage]='isUser' [class.otherMessage]='!isUser'>
-        <label>{{message.id}}</label>
-        <br/>
-        <label>{{message.time.toLocaleString()}}</label>
-        <p>{{message.message}}</p>
+    <div class="col">
+        <div [class.message-wrapper-user]='isUser'>
+            <label style="display:inline-block;">{{message.time.toLocaleTimeString()}}</label>
+            <div style="display:inline-block;" class="message" [class.myMessage]='isUser' [class.otherMessage]='!isUser'>
+                <p>{{message.message}}</p>
+            </div>
+        </div>
     </div>
 </div>

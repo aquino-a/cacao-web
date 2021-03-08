@@ -79,7 +79,8 @@ export class ChatComponent implements OnInit {
 
 @Component({
   selector: 'app-message',
-  templateUrl: './message.component.html'
+  templateUrl: './message.component.html',
+  styleUrls: ['./chat.component.css']
 })
 export class MessageComponent {
   @Input() message: Message;
