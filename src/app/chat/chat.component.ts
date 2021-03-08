@@ -25,17 +25,12 @@ export class ChatComponent implements OnInit {
     ) { 
       auth.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       auth.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
-      messageService.newMessage$.subscribe({next: this.newMessage });
     }
 
   ngOnInit(): void {
     this.route.params.subscribe(p =>{
       this.chatId = this.route.snapshot.paramMap.get('id');
-      this.messageService
-        .fetchMessages(this.chatId)
-        .subscribe(messages =>{
-          this.messages = messages;
-        });
+      this.messages = this.messageService.fetchMessages(this.chatId);
     });
   }
 

@@ -67,8 +67,6 @@ export class MessageService {
   processNewMessage = (data: any) => {
     const message = JSON.parse(data.body, this.messageParse) as Message;
 
-    this.newMessageSource.next(message);
-
     const chatId = this.getChatId(message);
     if(this.messages.has(chatId)){
       var ms = this.messages.get(chatId);
@@ -97,9 +95,13 @@ export class MessageService {
       console.log('Connected');
   }
   
-  fetchMessages(chatId: string): Observable<Message[]> {
-    if(this.messages.has(chatId))
-      return of(this.messages.get(chatId));
+  fetchMessages(chatId: string): Message[] {
+    if(this.messages.has(chatId)){
+      return this.messages.get(chatId);
+    }
+    else {
+      this.messages.set(chatId, []);
+    }
 
     const options = { 
       params: 
@@ -117,8 +119,8 @@ export class MessageService {
       });
       return ms;
     }));
-    pipedOb.subscribe(messages => this.messages.set(chatId, messages));
-    return pipedOb;
+    pipedOb.subscribe(messages => this.messages.get(chatId).push(...messages));
+    return this.messages.get(chatId);
   }
 
   send(toUser: string, newMessage: string) {
