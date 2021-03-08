@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { isNullOrUndefined } from 'util';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -9,6 +10,9 @@ import { isNullOrUndefined } from 'util';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+
+  redirectUrl = environment.redirectUrl;
+  clientId = environment.clientId;
 
   constructor(private activatedRoute: ActivatedRoute, private authenticationService: AuthenticationService ) {
 
