@@ -44,3 +44,7 @@
 .message-wrapper-user {
     text-align: end;
 }
+.message-child {
+    display:inline-block;
+    margin: 0px 10px;
+}
