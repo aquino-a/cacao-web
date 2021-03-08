@@ -85,4 +85,6 @@ export class ChatComponent implements OnInit {
 export class MessageComponent {
   @Input() message: Message;
   @Input() isUser: boolean;
+  @Input() isNewDate: boolean = true;
+  @Input() isNewTime: boolean = true;
 }

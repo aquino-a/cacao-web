@@ -1,11 +1,12 @@
-<div class="row"  [class.justify-content-end]='isUser' [class.justify-content-start]='!isUser'>
+<div class=""  [class.justify-content-end]='isUser' [class.justify-content-start]='!isUser'>
+    <div *ngIf='isNewDate' class="separator">{{message.time.toLocaleDateString()}}</div>
     <div class="col">
         <div [class.message-wrapper-user]='isUser'>
-            <label *ngIf='isUser' class="message-child">{{message.time.toLocaleTimeString()}}</label>
+            <label *ngIf='isUser && isNewTime' class="message-child">{{message.time.toLocaleTimeString()}}</label>
             <div class="message message-child" [class.myMessage]='isUser' [class.otherMessage]='!isUser'>
                 <p style="margin: 0px;">{{message.message}}</p>
             </div>
-            <label *ngIf='!isUser' class="message-child">{{message.time.toLocaleTimeString()}}</label>
+            <label *ngIf='!isUser && isNewTime' class="message-child">{{message.time.toLocaleTimeString()}}</label>
         </div>
     </div>
 </div>
