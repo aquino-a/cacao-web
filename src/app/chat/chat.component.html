@@ -1,5 +1,5 @@
 <cdk-virtual-scroll-viewport [itemSize]="46" style="height: 100%;">
-    <div class="message-container" #messageContainer>
+    <div class="message-container">
         <div #messages id="messages" *cdkVirtualFor='let message of messages; index as i; first as isFirst;'>
             <app-message [message]="message" [isUser]='message.fromUser == currentUserId' [isNewDate]="isFirst || isNewDate(i)" [isNewTime]="isNewTime(i)" ></app-message>
         </div>   

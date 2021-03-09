@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
 import { isDefined } from '@angular/compiler/src/util';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-chat',
@@ -12,7 +13,7 @@ import { isDefined } from '@angular/compiler/src/util';
 export class ChatComponent implements OnInit {
  
   @ViewChildren('messages') private messageContainer: QueryList<ElementRef>;
-  @ViewChild('messageContainer') private messageContainerChild: ElementRef;
+  @ViewChild(CdkVirtualScrollViewport) virtualMessages: CdkVirtualScrollViewport;
   
   chatId: string;
   messages: Message[];
@@ -49,6 +50,7 @@ export class ChatComponent implements OnInit {
     }
 
     this.messages = [...this.messages, message];
+    this.scrollToBottom();
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -65,7 +67,7 @@ export class ChatComponent implements OnInit {
 
   scrollToBottom = () => {
     try {
-      this.messageContainerChild.nativeElement.scrollTop = this.messageContainerChild.nativeElement.scrollHeight;
+      this.virtualMessages.scrollToIndex(this.messages.length - 1);
     } catch(error) {
       console.log(error);
     }  
