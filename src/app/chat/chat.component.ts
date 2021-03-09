@@ -31,7 +31,11 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(p =>{
       this.chatId = this.route.snapshot.paramMap.get('id');
-      this.messages = this.messageService.fetchMessages(this.chatId);
+      this.messageService
+        .fetchMessages(this.chatId)
+        .subscribe(messages =>{
+          this.messages = messages;
+        });
     });
     this.messageService.newMessage$.subscribe({next: this.newMessage });
   }

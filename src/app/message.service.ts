@@ -96,12 +96,9 @@ export class MessageService {
       console.log('Connected');
   }
   
-  fetchMessages(chatId: string): Message[] {
+  fetchMessages(chatId: string): Observable<Message[]> {
     if(this.messages.has(chatId)){
-      return this.messages.get(chatId);
-    }
-    else {
-      this.messages.set(chatId, []);
+      return of(this.messages.get(chatId));
     }
 
     const options = { 
@@ -120,8 +117,8 @@ export class MessageService {
       });
       return ms;
     }));
-    pipedOb.subscribe(messages => this.messages.get(chatId).push(...messages));
-    return this.messages.get(chatId);
+    pipedOb.subscribe(messages => this.messages.set(chatId, messages));
+    return pipedOb;
   }
 
   send(toUser: string, newMessage: string) {
