@@ -21,8 +21,7 @@ export class FriendListComponent implements OnInit {
   }
 
   getFriendList(){
-    this.friendService.fetchFriendList()
-      .subscribe(fs => { console.log(fs); this.friendList = fs; }, error => console.log(error));
+    this.friendList = this.friendService.fetchFriendList();
   }
 
   addEmail(){

@@ -10,15 +10,23 @@ import { User } from './user';
 })
 export class FriendService {
   
+  friends: Friend[] = [];
+  friendIdSet: Set<string> = new Set<string>();
   
   constructor(private http: HttpClient) {
   }
   
-  fetchFriendList(): Observable<Friend[]> {
-    return this.http.get<User[]>(environment.baseUrl + "/api/friends")
-        .pipe(map(users => users.map(u => {
-          return { user: u, unreadMessages: 0 };
-        })));
+  fetchFriendList(): Friend[] {
+    const ob = this.http.get<User[]>(environment.baseUrl + "/api/friends")
+        .pipe(map(users => 
+          users.filter(u => !this.friendIdSet.has(u.id))
+            .map(u => {
+              this.friendIdSet.add(u.id);
+              return { user: u, unreadMessages: 0 };
+            }
+        )));
+    ob.subscribe({next: fs => this.friends.push(...fs)});
+    return this.friends;
   }
 
   addFriend(email: string): Observable<Object>{
