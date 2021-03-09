@@ -117,7 +117,7 @@ export class MessageService {
       });
       return ms;
     }));
-    pipedOb.subscribe(messages => this.messages.set(chatId, messages));
+    pipedOb.subscribe({next:messages => this.messages.set(chatId, messages)});
     return pipedOb;
   }
 
