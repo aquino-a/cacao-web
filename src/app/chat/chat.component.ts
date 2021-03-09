@@ -32,6 +32,7 @@ export class ChatComponent implements OnInit {
       this.chatId = this.route.snapshot.paramMap.get('id');
       this.messages = this.messageService.fetchMessages(this.chatId);
     });
+    this.messageService.newMessage$.subscribe({next: this.newMessage });
   }
 
   ngAfterViewInit() {
@@ -47,7 +48,7 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.messages.push(message);
+    this.messages = [...this.messages, message];
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }

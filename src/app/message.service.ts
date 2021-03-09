@@ -66,7 +66,8 @@ export class MessageService {
 
   processNewMessage = (data: any) => {
     const message = JSON.parse(data.body, this.messageParse) as Message;
-
+    
+    this.newMessageSource.next(message);
     const chatId = this.getChatId(message);
     if(this.messages.has(chatId)){
       var ms = this.messages.get(chatId);
