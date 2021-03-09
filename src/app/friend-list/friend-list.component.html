@@ -4,7 +4,8 @@
             <input type="text" width="50px"  [(ngModel)]="newEmail" #email="ngModel" email>
             <button [disabled]="!email.valid" (click) ="addEmail()">Add Friend</button>
     </div>
-    <div  style="display: inline-block;" *ngFor="let friend of friendList" class="py-2" data-toggle="tooltip" data-html="true" title="{{friend.user.realName}}" routerLink="/chat/{{friend.user.id}}"> 
+    <div  style="display: inline-block; position: relative;" *ngFor="let friend of friendList" class="py-2" data-toggle="tooltip" data-html="true" title="{{friend.user.realName}}" routerLink="/chat/{{friend.user.id}}"> 
         <img class="rounded" src="{{friend.user.imgUrl}}" />
+        <div class="circle" style="position: absolute; top: 10px;right: 2px;">{{friend.unreadMessages}}</div>
     </div>
 </div>
