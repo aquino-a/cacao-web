@@ -18,11 +18,11 @@
     </ng-template>
 </nav>
 <div>
-    <div class="row h-100" style="margin-top: 60px;">
-        <div *ngIf="currentUser" class="collapse col-md-3 col-12 show" id="collapseFriends">
+    <div class="h-100" style="margin-top: 60px; display: flex;">
+        <div *ngIf="currentUser" class="show" id="collapseFriends">
             <app-friend-list class=""></app-friend-list>
         </div>
-        <div class="col" style="padding-right: 0px;">
+        <div style="width:100%; display: inline-block;">
             <main class="main-container">
                 <router-outlet ></router-outlet>
             </main>

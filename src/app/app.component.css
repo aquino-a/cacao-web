@@ -13,3 +13,20 @@
     left: 0;
     z-index: 1030;
 }
+
+.main-container{
+    height:88vh;
+    width: 100%;
+}
+
+#collapseFriends {
+    position: relative;
+    z-index: 2;
+}
+
+@media only screen and (max-width: 600px) {
+    #collapseFriends {
+        position: fixed;
+        left: 10px;
+    }
+}
