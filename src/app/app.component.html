@@ -4,7 +4,10 @@
         Cacao
     </a>
     <div *ngIf="currentUser; else elseBlock">
-        <a (click)="auth.logout()">
+        <button type="button" data-toggle="collapse" data-target="#collapseFriends" aria-expanded="false" aria-controls="collapseFriends">
+            Friends
+        </button>
+        <a (click)="auth.logout()" style="margin-left: 20px; margin-right: 5px;">
             <img src="{{currentUser.imgUrl}}" width="30" height="30" class="d-inline-block align-top" alt="" loading="lazy">
         </a>
     </div>
@@ -15,15 +18,14 @@
     </ng-template>
 </nav>
 <div>
-    <div>
-        <div *ngIf="currentUser">
-            <app-friend-list class="sidebar"></app-friend-list>
+    <div class="row h-100" style="margin-top: 60px;">
+        <div *ngIf="currentUser" class="collapse col-md-3 col-12 show" id="collapseFriends">
+            <app-friend-list class=""></app-friend-list>
         </div>
-        <div style="margin-left: 220px;">
+        <div class="col" style="padding-right: 0px;">
             <main class="main-container">
                 <router-outlet ></router-outlet>
             </main>
-
         </div>
     </div>
 </div>
