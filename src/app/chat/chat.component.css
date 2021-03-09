@@ -8,7 +8,7 @@
 
 .message {
     border-radius: 16px;
-    padding: 1em;
+    padding: .75em 1em;
     flex-basis: 100%;
 }
 

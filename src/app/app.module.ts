@@ -11,6 +11,7 @@ import { AuthGuard } from './auth.guard';
 import { AuthenticationService } from './authentication.service';
 import { httpInterceptorProviders } from './interceptors/index'
 import { FormsModule } from '@angular/forms';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ScrollingModule
   ],
   providers: [
     AuthGuard,
