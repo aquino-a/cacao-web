@@ -20,6 +20,13 @@ export class MessageService {
 
   private newMessageSource = new BehaviorSubject<Message>(null);
   newMessage$ = this.newMessageSource.asObservable();
+
+  private disconnectedSource = new BehaviorSubject<any>(null);
+  disconnected$ = this.disconnectedSource.asObservable();
+
+  private connectedSource = new BehaviorSubject<any>(null);
+  connected$ = this.connectedSource.asObservable();
+
   
   constructor(private auth: AuthenticationService, private http: HttpClient) {
     this.createStompClient();
@@ -46,6 +53,7 @@ export class MessageService {
 
     this.stompClient.onConnect = this.onConnect;
     this.stompClient.onStompError = this.onStompError;
+    this.stompClient.onWebSocketClose = this.onClose;
     
     this.stompClient.activate();
   }
@@ -54,15 +62,20 @@ export class MessageService {
     console.log('Connected: ' + frame);
     this.setConnected(true);
     this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
+    this.connectedSource.next({});
   }
 
-  onStompError(frame: IFrame){
+  onStompError = (frame: IFrame) => {
       // Will be invoked in case of error encountered at Broker
       // Bad login/passcode typically will cause an error
       // Complaint brokers will set `message` header with a brief message. Body may contain details.
       // Compliant brokers will terminate the connection after any error
       console.log('Broker reported error: ' + frame.headers['message']);
       console.log('Additional details: ' + frame.body);
+  }
+
+  onClose = (evt: CloseEvent) => {
+    this.disconnectedSource.next({});
   }
 
   processNewMessage = (data: any) => {

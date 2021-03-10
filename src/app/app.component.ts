@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { User } from './user';
+import * as $ from "jquery";
+import "bootstrap";
+import { MessageService } from './message.service';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +15,7 @@ export class AppComponent {
   currentUser: User;
 
 
-  constructor(public auth: AuthenticationService){
+  constructor(public auth: AuthenticationService, private messageService: MessageService){
     auth.userLoginSuccess$.subscribe({
       next: user => {
         this.currentUser = user;
@@ -23,5 +26,15 @@ export class AppComponent {
         this.currentUser = null;
       }
     });
+    messageService.disconnected$.subscribe({next: (e) => {
+      if(e != null){
+        $('#disconnectedModal').modal("show");
+      }
+    }});
+    messageService.connected$.subscribe({next: (e) => {
+      if(e != null){
+        $('#disconnectedModal').modal("hide");
+      }
+    }});
   }
 }
