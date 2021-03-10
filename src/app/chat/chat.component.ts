@@ -35,6 +35,7 @@ export class ChatComponent implements OnInit {
         .fetchMessages(this.chatId)
         .subscribe(messages =>{
           this.messages = messages;
+          this.messages.filter(m => !m.wasRead).forEach(m => this.read(m));
         });
     });
     this.messageService.newMessage$.subscribe({next: this.newMessage });
@@ -50,6 +51,10 @@ export class ChatComponent implements OnInit {
     }
 
     if(message.fromUser != this.chatId && message.toUser != this.chatId){
+      return;
+    }
+
+    if(this.messageService.isDuplicateMessage(this.chatId, message.id)){
       return;
     }
 

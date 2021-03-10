@@ -16,7 +16,7 @@ export class MessageService {
   
   private stompClient: Client;
 
-  private messages = new Map<string, Message[]>();
+  private messages = new Map<string, Messages>();
 
   private newMessageSource = new BehaviorSubject<Message>(null);
   newMessage$ = this.newMessageSource.asObservable();
@@ -72,9 +72,13 @@ export class MessageService {
     const chatId = this.getChatId(message);
     if(this.messages.has(chatId)){
       var ms = this.messages.get(chatId);
-      ms.push(message);
+      if(ms.messageIds.has(message.id)){
+        return;
+      }
+      ms.messages.push(message);
+      ms.messageIds.add(message.id);
     }
-    else this.messages.set(chatId, [message]);
+    else this.messages.set(chatId, {messages: [message], messageIds: new Set<string>().add(message.id) });
   }
 
   getChatId(message: Message): string {
@@ -99,7 +103,10 @@ export class MessageService {
   
   fetchMessages(chatId: string): Observable<Message[]> {
     if(this.messages.has(chatId)){
-      return of(this.messages.get(chatId));
+      const ms = this.messages.get(chatId);
+      if(!ms.messages.every(m => !m.wasRead)){
+        return of(ms.messages);
+      }
     }
 
     const options = { 
@@ -116,10 +123,25 @@ export class MessageService {
       {
         m.time = new Date(m.time + 'Z');
       });
-      return ms;
+      this.setMessages(chatId, ms);
+      return this.messages.get(chatId).messages;
     }));
-    pipedOb.subscribe({next:messages => this.messages.set(chatId, messages)});
     return pipedOb;
+  }
+
+  setMessages(chatId: string, ms: Message[]) {
+    var messages = this.messages.get(chatId);
+
+    if(messages == null || messages == undefined){
+      messages = {messages: ms, messageIds: new Set<string>(ms.map(m => m.id)) };
+    }
+    else {
+      messages.messages.length = 0;
+      messages.messages.push(...ms);
+      messages.messageIds = new Set<string>(ms.map(m => m.id));
+    }
+
+    this.messages.set(chatId, messages);
   }
 
   send(toUser: string, newMessage: string) {
@@ -142,7 +164,7 @@ export class MessageService {
       body: message.id
     };
     this.stompClient.publish(params);
-    Promise.resolve(null).then(() => message.wasRead = true);
+    message.wasRead = true;
   }
 
   unreadMessageCount(user: User): number {
@@ -151,7 +173,17 @@ export class MessageService {
     if(messages == null || messages == undefined){
       return 0;
     }
-    return messages.filter(m => !m.wasRead && m.fromUser == user.id).length;
+    return messages.messages.filter(m => !m.wasRead && m.fromUser == user.id).length;
+  }
+
+  isDuplicateMessage(chatId: string, messageId: string): boolean {
+    const messages = this.messages.get(chatId);
+    
+    if(messages == null || messages == undefined){
+      return false;
+    }
+
+    return messages.messageIds.has(messageId);
   }
  
 }
@@ -163,4 +195,9 @@ export interface Message {
   message: string;
   time: Date;
   wasRead: boolean;
+}
+
+interface Messages {
+  messages: Message[];
+  messageIds: Set<string>;
 }
