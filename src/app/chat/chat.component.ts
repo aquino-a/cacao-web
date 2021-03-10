@@ -18,6 +18,7 @@ export class ChatComponent implements OnInit {
   chatId: string;
   messages: Message[];
   currentUserId: string;
+  private isNotificationsOk: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,6 +44,17 @@ export class ChatComponent implements OnInit {
 
   ngAfterViewInit() {
     this.messageContainer.changes.subscribe(this.scrollToBottom);
+    this.askNotificationPermission();
+  }
+
+  askNotificationPermission() {
+    if(!Notification) {
+      return;
+    } 
+
+    if(Notification.permission != 'granted'){
+      Notification.requestPermission().then(p => console.log(p));
+    }
   }
 
   newMessage = (message: Message) => {

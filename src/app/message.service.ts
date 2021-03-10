@@ -82,6 +82,7 @@ export class MessageService {
     const message = JSON.parse(data.body, this.messageParse) as Message;
     
     this.newMessageSource.next(message);
+    this.notify(message);
     const chatId = this.getChatId(message);
     if(this.messages.has(chatId)){
       var ms = this.messages.get(chatId);
@@ -92,6 +93,13 @@ export class MessageService {
       ms.messageIds.add(message.id);
     }
     else this.messages.set(chatId, {messages: [message], messageIds: new Set<string>().add(message.id) });
+  }
+
+  notify(message: Message) {
+    if(message.toUser != this.auth.currentUser.id) {
+      return;
+    }
+    const n = new Notification(message.message);
   }
 
   getChatId(message: Message): string {
