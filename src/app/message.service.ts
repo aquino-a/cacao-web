@@ -142,7 +142,7 @@ export class MessageService {
       body: message.id
     };
     this.stompClient.publish(params);
-    message.wasRead = true;
+    Promise.resolve(null).then(() => message.wasRead = true);
   }
 
   unreadMessageCount(user: User): number {
