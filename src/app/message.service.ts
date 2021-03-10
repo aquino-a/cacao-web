@@ -29,12 +29,12 @@ export class MessageService {
 
   
   constructor(private auth: AuthenticationService, private http: HttpClient) {
-    this.createStompClient();
+    this.setupAuthenticationEvents();
   }
   
   setupAuthenticationEvents() {
     this.auth.userLoginSuccess$.subscribe({next: user => this.createStompClient()});
-    this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect(); this.stompClient = null;}});
+    this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect();}});
   }
 
   createStompClient(): void {
