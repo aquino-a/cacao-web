@@ -7,6 +7,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
 import { AuthenticationService } from './authentication.service';
+import { User } from './user';
 
 @Injectable({
   providedIn: 'root'
@@ -141,6 +142,16 @@ export class MessageService {
       body: message.id
     };
     this.stompClient.publish(params);
+    message.wasRead = true;
+  }
+
+  unreadMessageCount(user: User): number {
+    const messages = this.messages.get(user.id);
+    
+    if(messages == null || messages == undefined){
+      return 0;
+    }
+    return messages.filter(m => !m.wasRead && m.fromUser == user.id).length;
   }
  
 }

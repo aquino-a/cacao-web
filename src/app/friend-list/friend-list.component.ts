@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from '../authentication.service';
 import { FriendService, Friend } from '../friend.service';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'app-friend-list',
@@ -11,7 +12,9 @@ export class FriendListComponent implements OnInit {
 
   newEmail: string = '';
 
-  constructor(private friendService: FriendService, private auth: AuthenticationService) {
+  constructor(private friendService: FriendService,
+     private auth: AuthenticationService,
+     public messageService: MessageService) {
     auth.userLoginSuccess$.subscribe(u => this.getFriendList());
   }
   
