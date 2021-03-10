@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from './authentication.service';
 import { User } from './user';
-import * as $ from "jquery";
-import "bootstrap";
 import { MessageService } from './message.service';
 
 @Component({
