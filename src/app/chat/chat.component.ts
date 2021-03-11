@@ -83,8 +83,8 @@ export class ChatComponent implements OnInit {
       return false;
     }
 
-    if(message.fromUser === this.auth.currentUser.id && message.toUser === this.auth.currentUser.id){
-      return this.chatId === this.auth.currentUser.id;
+    if(this.chatId === this.auth.currentUser.id){
+      return message.fromUser === this.auth.currentUser.id && message.toUser === this.auth.currentUser.id;
     }
 
     return true;
