@@ -136,6 +136,9 @@ export class ChatComponent implements OnInit {
     
     this.messageService.fetchOldMessages(this.chatId)
       .subscribe({next: ms => {
+        if(ms == null){
+          return;
+        }
         this.messages = ms;
       }, error: e =>{
         console.log(e);

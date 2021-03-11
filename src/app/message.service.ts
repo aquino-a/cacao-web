@@ -219,7 +219,7 @@ export class MessageService {
     const messages = this.messages.get(chatId);
 
     if(messages == null || messages.messages.length == 0 || !messages.hasOlderMessage){
-      return of([]);
+      return of(null);
     }
 
     const options = { 
@@ -233,7 +233,7 @@ export class MessageService {
     const pipedOb = ob.pipe(map(ms => {
       if(ms.length == 0){
         messages.hasOlderMessage = false;
-        return;
+        return null;
       }
       ms.forEach(this.updateStringDate);
       ms.sort(this.sortMessages);
