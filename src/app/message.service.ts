@@ -14,9 +14,11 @@ import { User } from './user';
 })
 export class MessageService {
   
+
   private stompClient: Client;
 
   private messages = new Map<string, Messages>();
+
 
   private newMessageSource = new BehaviorSubject<Message>(null);
   newMessage$ = this.newMessageSource.asObservable();
@@ -92,7 +94,7 @@ export class MessageService {
       ms.messages.push(message);
       ms.messageIds.add(message.id);
     }
-    else this.messages.set(chatId, {messages: [message], messageIds: new Set<string>().add(message.id) });
+    else this.messages.set(chatId, new Messages([message], new Set<string>().add(message.id)));
   }
 
   notify(message: Message) {
@@ -159,7 +161,7 @@ export class MessageService {
     var messages = this.messages.get(chatId);
 
     if(messages == null || messages == undefined){
-      messages = {messages: ms, messageIds: new Set<string>(ms.map(m => m.id)) };
+      messages = new Messages(ms, new Set<string>(ms.map(m => m.id)));
     }
     else {
       messages.messages.length = 0;
@@ -213,9 +215,10 @@ export class MessageService {
   }
 
   fetchOldMessages(chatId: string): Observable<Message[]> {
+
     const messages = this.messages.get(chatId);
 
-    if(messages == null || messages.messages.length == 0){
+    if(messages == null || messages.messages.length == 0 || !messages.hasOlderMessage){
       return of([]);
     }
 
@@ -228,6 +231,10 @@ export class MessageService {
     const ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
 
     const pipedOb = ob.pipe(map(ms => {
+      if(ms.length == 0){
+        messages.hasOlderMessage = false;
+        return;
+      }
       ms.forEach(this.updateStringDate);
       ms.sort(this.sortMessages);
       messages.messages = [...ms, ...messages.messages];
@@ -255,7 +262,13 @@ export interface Message {
   wasRead: boolean;
 }
 
-interface Messages {
+class Messages {
   messages: Message[];
   messageIds: Set<string>;
+  hasOlderMessage: boolean = true;
+
+  constructor(messages: Message[], messageIds: Set<string>){
+    this.messages = messages;
+    this.messageIds = messageIds;
+  }
 }
