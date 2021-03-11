@@ -2,8 +2,10 @@ import { Component, OnInit, Input, ElementRef, QueryList, ViewChildren, ViewChil
 import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
-import { isDefined } from '@angular/compiler/src/util';
+import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { isNull } from '@angular/compiler/src/output/output_ast';
+import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
 
 @Component({
   selector: 'app-chat',
@@ -92,6 +94,9 @@ export class ChatComponent implements OnInit {
   }
 
   send(newMessage: string){
+    if(newMessage.length == 0){
+      return;
+    }
     this.messageService.send(this.chatId, newMessage);
   }
 
