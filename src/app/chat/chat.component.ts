@@ -45,6 +45,7 @@ export class ChatComponent implements OnInit {
   ngAfterViewInit() {
     this.messageContainer.changes.subscribe(this.scrollToBottom);
     this.askNotificationPermission();
+    this.virtualMessages.scrolledIndexChange.subscribe({next: this.onScrolled});
   }
 
   askNotificationPermission() {
@@ -126,6 +127,19 @@ export class ChatComponent implements OnInit {
       return true;
     }
     else return current.time.getMinutes() != next.time.getMinutes();
+  }
+
+  onScrolled = (newIndex: number): void => {
+    if(newIndex > 0){
+      return;
+    }
+    
+    this.messageService.fetchOldMessages(this.chatId)
+      .subscribe({next: ms => {
+        this.messages = ms;
+      }, error: e =>{
+        console.log(e);
+      }});
   }
 
 }

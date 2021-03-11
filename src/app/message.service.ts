@@ -102,7 +102,7 @@ export class MessageService {
     if(!Notification){
       return;
     }
-    
+
     const n = new Notification(message.message);
   }
 
@@ -144,10 +144,8 @@ export class MessageService {
     const ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
 
     const pipedOb = ob.pipe(map(ms => {
-      ms.forEach(m =>
-      {
-        m.time = new Date(m.time + 'Z');
-      });
+      ms.forEach(this.updateStringDate);
+      ms.sort(this.sortMessages);
       this.setMessages(chatId, ms);
       return this.messages.get(chatId).messages;
     }));
@@ -209,6 +207,38 @@ export class MessageService {
     }
 
     return messages.messageIds.has(messageId);
+  }
+
+  fetchOldMessages(chatId: string): Observable<Message[]> {
+    const messages = this.messages.get(chatId);
+
+    if(messages == null || messages.messages.length == 0){
+      return of([]);
+    }
+
+    const options = { 
+      params: 
+        new HttpParams()
+          .set("userId2", chatId)
+          .set("earlierThan", messages.messages[0].time.toISOString())
+    };
+    const ob = this.http.get<Message[]>(environment.baseUrl + "/api/message", options);
+
+    const pipedOb = ob.pipe(map(ms => {
+      ms.forEach(this.updateStringDate);
+      ms.sort(this.sortMessages);
+      messages.messages = [...ms, ...messages.messages];
+      return messages.messages;
+    }));
+    return pipedOb;
+  }
+
+  updateStringDate(message: Message): void {
+    message.time = new Date(message.time + 'Z');
+  }
+
+  sortMessages(message1: Message, message2: Message): number {
+    return message1.time.getTime() - message2.time.getTime();
   }
  
 }
