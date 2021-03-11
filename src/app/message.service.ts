@@ -99,6 +99,10 @@ export class MessageService {
     if(message.toUser != this.auth.currentUser.id) {
       return;
     }
+    if(!Notification){
+      return;
+    }
+    
     const n = new Notification(message.message);
   }
 
