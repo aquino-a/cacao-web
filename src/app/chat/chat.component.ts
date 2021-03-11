@@ -11,7 +11,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
- 
+  
   @ViewChildren('messages') private messageContainer: QueryList<ElementRef>;
   @ViewChild(CdkVirtualScrollViewport) virtualMessages: CdkVirtualScrollViewport;
   
@@ -62,7 +62,7 @@ export class ChatComponent implements OnInit {
       return;  
     }
 
-    if(message.fromUser != this.chatId && message.toUser != this.chatId){
+    if(!this.isThisChat(message)){
       return;
     }
 
@@ -76,6 +76,18 @@ export class ChatComponent implements OnInit {
       this.read(message);
     }
 
+  }
+
+  isThisChat(message: Message): boolean {
+    if(message.fromUser != this.chatId && message.toUser != this.chatId){
+      return false;
+    }
+
+    if(message.fromUser === this.auth.currentUser.id && message.toUser === this.auth.currentUser.id){
+      return this.chatId === this.auth.currentUser.id;
+    }
+
+    return true;
   }
 
   send(newMessage: string){
