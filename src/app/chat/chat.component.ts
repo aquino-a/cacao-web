@@ -94,7 +94,7 @@ export class ChatComponent implements OnInit {
   }
 
   send(newMessage: string){
-    if(newMessage.length == 0){
+    if(newMessage.length === 0){
       return;
     }
     this.messageService.send(this.chatId, newMessage);
