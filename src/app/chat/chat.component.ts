@@ -8,6 +8,7 @@ import { isNull } from '@angular/compiler/src/output/output_ast';
 import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { ListRange } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-chat',
@@ -50,13 +51,13 @@ export class ChatComponent implements OnInit {
           this.messages = messages;
           this.messages.filter(m => !m.wasRead).forEach(m => this.read(m));
           this.scrollToOnce(this.messages.length - 1);
+          this.onScrollSubscribe();
         });
     });
   }
 
   ngAfterViewInit() {
     this.askNotificationPermission();
-    this.onScrollSubscribe();
   }
 
   ngOnDestroy(){
@@ -121,8 +122,8 @@ export class ChatComponent implements OnInit {
     this.messageContainer.changes
       .pipe(take(1))
       .subscribe({
-        next: (args) => this.virtualMessages.scrollToIndex(index),
-        complete: () => this.isScrolling = false
+        next: (args) => { this.isScrolling = true; console.log("is scrolling: " + this.isScrolling); this.virtualMessages.scrollToIndex(index); },
+        complete: () => { this.isScrolling = false; console.log("is scrolling: " + this.isScrolling);}
       });
   }
 
@@ -157,24 +158,37 @@ export class ChatComponent implements OnInit {
   }
 
   onScrolled = (newIndex: number): void => {
+    console.log("changed index: " + newIndex);
     if(newIndex > 5 || this.isScrolling){
       return;
     }
+    this.scrollUpSub.unsubscribe();
+    this.oldMessageObserve.run();
+  }
 
+ onRangeChange = (range: ListRange): void => {
+    console.log("changed range: " + range.start + " " + range.end);
+    if(range.start > 3 || this.isScrolling){
+      return;
+    }
+    this.scrollUpSub.unsubscribe();
     this.oldMessageObserve.run();
   }
 
   processOldMessages = (ms: Message[]): void => {
-    if(ms == null) {
-      return;
+    try{
+      if(ms == null || ms.length == 0) {
+        return;
+      }
+      const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+      this.scrollToOnce(scrollIndex);
+      console.log(new Date().getMilliseconds());
+      this.messages = ms;
+      console.log("scroll to: " + scrollIndex);
     }
-    const scrollIndex = this.calculateMessageIndex(this.messages, ms);
-    this.scrollToOnce(scrollIndex);
-    console.log(new Date().getMilliseconds());
-    if(this.messages)
-      console.log("current messsage count: " + this.messages.length);
-    this.messages = ms;
-    console.log("scroll to: " + scrollIndex);
+    finally{
+      this.onScrollSubscribe();
+    }
   }
 
   calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
@@ -184,8 +198,8 @@ export class ChatComponent implements OnInit {
 
   onScrollSubscribe(): void {
     console.log("scroll up subbed");
-    this.scrollUpSub = this.virtualMessages.scrolledIndexChange
-      .subscribe({next: this.onScrolled});
+    this.scrollUpSub = this.virtualMessages.renderedRangeStream
+      .subscribe({next: this.onRangeChange})
   }
 
 }
@@ -222,7 +236,7 @@ class PacedObservable<T> {
     this.obFactory().subscribe({
       next:this.subNext,
       complete: () => this.isRunning = false,
-      error: (e) => console.log(e)
+      error: (e) => { console.log(e); this.isRunning = false; }
     })
   }
 
