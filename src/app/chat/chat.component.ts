@@ -16,6 +16,7 @@ import { ListRange } from '@angular/cdk/collections';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
+ 
   
   @ViewChildren('messages') private messageContainer: QueryList<ElementRef>;
   @ViewChild(CdkVirtualScrollViewport) virtualMessages: CdkVirtualScrollViewport;
@@ -30,6 +31,7 @@ export class ChatComponent implements OnInit {
 
   private oldMessageObserve: PacedObservable<Message[]>;
   private isScrolling: boolean;  
+  private lastScrollIndex: number = Number.MIN_SAFE_INTEGER;
 
   constructor(
     private route: ActivatedRoute,
@@ -122,8 +124,8 @@ export class ChatComponent implements OnInit {
     this.messageContainer.changes
       .pipe(take(1))
       .subscribe({
-        next: (args) => { this.isScrolling = true; console.log("is scrolling: " + this.isScrolling); this.virtualMessages.scrollToIndex(index); },
-        complete: () => { this.isScrolling = false; console.log("is scrolling: " + this.isScrolling);}
+        next: (args) => { this.isScrolling = true;  this.virtualMessages.scrollToIndex(index); },
+        complete: () => { this.isScrolling = false; }
       });
   }
 
@@ -159,7 +161,7 @@ export class ChatComponent implements OnInit {
 
   onScrolled = (newIndex: number): void => {
     console.log("changed index: " + newIndex);
-    if(newIndex > 5 || this.isScrolling){
+    if( newIndex > 10 || this.isScrolling){
       return;
     }
     this.scrollUpSub.unsubscribe();
@@ -167,12 +169,32 @@ export class ChatComponent implements OnInit {
   }
 
  onRangeChange = (range: ListRange): void => {
+    console.log("last index: " + this.lastScrollIndex);
     console.log("changed range: " + range.start + " " + range.end);
-    if(range.start > 3 || this.isScrolling){
+    if(!this.needsRefresh(this.lastScrollIndex, range.start) || this.isScrolling){
+      this.lastScrollIndex = range.start;
       return;
     }
     this.scrollUpSub.unsubscribe();
     this.oldMessageObserve.run();
+    this.lastScrollIndex = Number.MIN_SAFE_INTEGER;
+  }
+
+  needsRefresh(lastIndex: number, newIndex: number): boolean {
+    if(newIndex >= lastIndex){
+      return false;
+    }
+
+    if(lastIndex - newIndex > 8){
+      return false;
+    }
+
+    if(newIndex > 10){
+      return false;
+    }
+
+    return true;
+    
   }
 
   processOldMessages = (ms: Message[]): void => {
@@ -180,11 +202,9 @@ export class ChatComponent implements OnInit {
       if(ms == null || ms.length == 0) {
         return;
       }
-      const scrollIndex = this.calculateMessageIndex(this.messages, ms);
-      this.scrollToOnce(scrollIndex);
-      console.log(new Date().getMilliseconds());
+      // const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+      // this.scrollToOnce(scrollIndex);
       this.messages = ms;
-      console.log("scroll to: " + scrollIndex);
     }
     finally{
       this.onScrollSubscribe();
@@ -192,12 +212,11 @@ export class ChatComponent implements OnInit {
   }
 
   calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
-    return newArray.length - oldArray.length + 10;
+    return newArray.length - oldArray.length + 5;
   }
   
 
   onScrollSubscribe(): void {
-    console.log("scroll up subbed");
     this.scrollUpSub = this.virtualMessages.renderedRangeStream
       .subscribe({next: this.onRangeChange})
   }

@@ -45,7 +45,7 @@ export class MessageService {
       
     this.stompClient = new Client({
         debug: function (str) {
-          console.log(str);
+          // console.log(str);
         },
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
@@ -61,7 +61,7 @@ export class MessageService {
   }
 
   onConnect = (frame: IFrame) => {
-    console.log('Connected: ' + frame);
+    // console.log('Connected: ' + frame);
     this.setConnected(true);
     this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
     this.connectedSource.next({});
@@ -224,7 +224,7 @@ export class MessageService {
        messages.messages.filter(m => !m.wasRead).length === messages.messages.length){
       return of(null);
     }
-    console.log("getting old messages: " + messages.messages.length);
+    console.log("!! !!  getting old messages: " + messages.messages.length);
 
     const options = { 
       params: 
