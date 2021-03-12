@@ -39,13 +39,13 @@ export class ChatComponent implements OnInit {
         .subscribe(messages =>{
           this.messages = messages;
           this.messages.filter(m => !m.wasRead).forEach(m => this.read(m));
+          this.scrollToOnce(this.messages.length - 1);
         });
     });
     this.messageService.newMessage$.subscribe({next: this.newMessage });
   }
 
   ngAfterViewInit() {
-    this.messageContainer.changes.subscribe(this.scrollToBottom);
     this.askNotificationPermission();
     this.virtualMessages.scrolledIndexChange.subscribe({next: this.onScrolled});
   }
@@ -74,7 +74,7 @@ export class ChatComponent implements OnInit {
     }
 
     this.messages = [...this.messages, message];
-    this.scrollToBottom();
+    // this.scrollToBottom();
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -102,6 +102,13 @@ export class ChatComponent implements OnInit {
 
   read(message: Message){
     this.messageService.readMessage(message);
+  }
+
+  scrollToOnce(index: number) {
+    const intialSub = this.messageContainer.changes.subscribe({
+      next: (args) => this.virtualMessages.scrollToIndex(index),
+      complete: () => intialSub.unsubscribe()
+    });
   }
 
   scrollToBottom = () => {
