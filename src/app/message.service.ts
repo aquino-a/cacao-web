@@ -218,7 +218,10 @@ export class MessageService {
 
     const messages = this.messages.get(chatId);
 
-    if(messages == null || messages.messages.length == 0 || !messages.hasOlderMessage){
+    if(messages == null ||
+       messages.messages.length == 0 || 
+       !messages.hasOlderMessage ||
+       messages.messages.filter(m => !m.wasRead).length === messages.messages.length){
       return of(null);
     }
     console.log("getting old messages: " + messages.messages.length);
