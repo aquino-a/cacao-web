@@ -6,6 +6,7 @@ import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { isNull } from '@angular/compiler/src/output/output_ast';
 import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -21,6 +22,7 @@ export class ChatComponent implements OnInit {
   messages: Message[];
   currentUserId: string;
   private isNotificationsOk: boolean;
+  private subscription: Subscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +31,7 @@ export class ChatComponent implements OnInit {
     ) { 
       auth.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       auth.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
+      messageService.newMessage$.subscribe({next: this.newMessage });
     }
 
   ngOnInit(): void {
@@ -42,12 +45,15 @@ export class ChatComponent implements OnInit {
           this.scrollToOnce(this.messages.length - 1);
         });
     });
-    this.messageService.newMessage$.subscribe({next: this.newMessage });
   }
 
   ngAfterViewInit() {
     this.askNotificationPermission();
-    this.virtualMessages.scrolledIndexChange.subscribe({next: this.onScrolled});
+    this.subscription.add(this.virtualMessages.scrolledIndexChange.subscribe({next: this.onScrolled}));
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
   askNotificationPermission() {
