@@ -121,10 +121,11 @@ export class ChatComponent implements OnInit {
   }
 
   scrollToOnce(index: number) {
+    console.log("ordered to scroll to: " + index);
     this.messageContainer.changes
       .pipe(take(1))
       .subscribe({
-        next: (args) => { this.isScrolling = true;  this.virtualMessages.scrollToIndex(index); },
+        next: (args) => { this.isScrolling = true; console.log("actually scrolls to: " + index);  this.virtualMessages.scrollToIndex(index); },
         complete: () => { this.isScrolling = false; }
       });
   }
@@ -202,7 +203,10 @@ export class ChatComponent implements OnInit {
       if(ms == null || ms.length == 0) {
         return;
       }
-      // const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+      const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+      setTimeout(() => {
+        this.virtualMessages.scrollToIndex(scrollIndex);
+      }, 100);
       // this.scrollToOnce(scrollIndex);
       this.messages = ms;
     }
@@ -212,7 +216,8 @@ export class ChatComponent implements OnInit {
   }
 
   calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
-    return newArray.length - oldArray.length + 5;
+    const diff = newArray.length - oldArray.length;
+    return diff + (diff / 2);
   }
   
 
