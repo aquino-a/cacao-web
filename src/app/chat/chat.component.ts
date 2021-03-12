@@ -6,7 +6,7 @@ import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { isNull } from '@angular/compiler/src/output/output_ast';
 import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -24,6 +24,11 @@ export class ChatComponent implements OnInit {
   currentUserId: string;
   private isNotificationsOk: boolean;
   private subscription: Subscription = new Subscription();
+  private scrollUpSub: Subscription;
+
+
+  private oldMessageObserve: PacedObservable<Message[]>;
+  private isScrolling: boolean;  
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +38,7 @@ export class ChatComponent implements OnInit {
       auth.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       auth.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
       messageService.newMessage$.subscribe({next: this.newMessage });
+      this.oldMessageObserve = new PacedObservable(() => this.messageService.fetchOldMessages(this.chatId), this.processOldMessages);
     }
 
   ngOnInit(): void {
@@ -50,7 +56,7 @@ export class ChatComponent implements OnInit {
 
   ngAfterViewInit() {
     this.askNotificationPermission();
-    this.subscription.add(this.virtualMessages.scrolledIndexChange.subscribe({next: this.onScrolled}));
+    this.onScrollSubscribe();
   }
 
   ngOnDestroy(){
@@ -114,7 +120,10 @@ export class ChatComponent implements OnInit {
   scrollToOnce(index: number) {
     this.messageContainer.changes
       .pipe(take(1))
-      .subscribe({next: (args) => this.virtualMessages.scrollToIndex(index)});
+      .subscribe({
+        next: (args) => this.virtualMessages.scrollToIndex(index),
+        complete: () => this.isScrolling = false
+      });
   }
 
   scrollToBottom = () => {
@@ -148,19 +157,35 @@ export class ChatComponent implements OnInit {
   }
 
   onScrolled = (newIndex: number): void => {
-    if(newIndex > 0){
+    if(newIndex > 5 || this.isScrolling){
       return;
     }
-    
-    this.messageService.fetchOldMessages(this.chatId)
-      .subscribe({next: ms => {
-        if(ms == null){
-          return;
-        }
-        this.messages = ms;
-      }, error: e =>{
-        console.log(e);
-      }});
+
+    this.oldMessageObserve.run();
+  }
+
+  processOldMessages = (ms: Message[]): void => {
+    if(ms == null) {
+      return;
+    }
+    const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+    this.scrollToOnce(scrollIndex);
+    console.log(new Date().getMilliseconds());
+    if(this.messages)
+      console.log("current messsage count: " + this.messages.length);
+    this.messages = ms;
+    console.log("scroll to: " + scrollIndex);
+  }
+
+  calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
+    return newArray.length - oldArray.length + 10;
+  }
+  
+
+  onScrollSubscribe(): void {
+    console.log("scroll up subbed");
+    this.scrollUpSub = this.virtualMessages.scrolledIndexChange
+      .subscribe({next: this.onScrolled});
   }
 
 }
@@ -175,4 +200,30 @@ export class MessageComponent {
   @Input() isUser: boolean;
   @Input() isNewDate: boolean = true;
   @Input() isNewTime: boolean = true;
+}
+
+class PacedObservable<T> {
+
+  private readonly obFactory: () => Observable<T>;
+  private readonly subNext: (t: T) => void;
+  private isRunning: boolean;
+
+  constructor(obFactory: () => Observable<T>, subNext: (t: T) => void) {
+    this.obFactory = obFactory;
+    this.subNext = subNext;
+  }
+
+  run(): void {
+    if(this.isRunning){
+      return;
+    }
+    this.isRunning = true;
+
+    this.obFactory().subscribe({
+      next:this.subNext,
+      complete: () => this.isRunning = false,
+      error: (e) => console.log(e)
+    })
+  }
+
 }

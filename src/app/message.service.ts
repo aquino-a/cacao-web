@@ -221,6 +221,7 @@ export class MessageService {
     if(messages == null || messages.messages.length == 0 || !messages.hasOlderMessage){
       return of(null);
     }
+    console.log("getting old messages: " + messages.messages.length);
 
     const options = { 
       params: 
