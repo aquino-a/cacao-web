@@ -7,6 +7,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { isNull } from '@angular/compiler/src/output/output_ast';
 import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
 import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat',
@@ -79,8 +80,8 @@ export class ChatComponent implements OnInit {
       return;
     }
 
+    this.scrollToOnce(this.messages.length - 1);
     this.messages = [...this.messages, message];
-    // this.scrollToBottom();
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
     }
@@ -111,10 +112,9 @@ export class ChatComponent implements OnInit {
   }
 
   scrollToOnce(index: number) {
-    const intialSub = this.messageContainer.changes.subscribe({
-      next: (args) => this.virtualMessages.scrollToIndex(index),
-      complete: () => intialSub.unsubscribe()
-    });
+    this.messageContainer.changes
+      .pipe(take(1))
+      .subscribe({next: (args) => this.virtualMessages.scrollToIndex(index)});
   }
 
   scrollToBottom = () => {
