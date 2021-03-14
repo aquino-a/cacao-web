@@ -36,7 +36,7 @@ export class MessageService {
   
   setupAuthenticationEvents() {
     this.auth.userLoginSuccess$.subscribe({next: user => this.createStompClient()});
-    this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect();}});
+    this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect(); this.stompClient.deactivate(); }});
   }
 
   createStompClient(): void {
