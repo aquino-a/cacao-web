@@ -188,13 +188,13 @@ export class ChatComponent implements OnInit {
     if(ms == null || ms.length == 0) {
       return;
     }
-    const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+    const offset = this.calculateScrollOffset();
     this.isRefreshing = true;
     this.messages = ms;
 
     const p = new Promise((resolve, reject) =>{
       setTimeout(() => {
-        this.virtualViewport.scrollToIndex(scrollIndex);
+        this.virtualViewport.scrollToOffset(offset);
         this.isRefreshing = false;
         resolve(null);
         this.onScrollSubscribe();
@@ -202,19 +202,18 @@ export class ChatComponent implements OnInit {
     });
   }
 
-  // messageTrackBy = (index: number, item: Message): any => {
-  //   if(this.scrollToChange === null || this.scrollToChange === undefined || this.updateCount < this.updateTarget){
-  //     this.updateCount++;
-  //     return;
-  //   }
-  // }
-
   calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
     const range = this.virtualViewport.getRenderedRange();
     const diff = newArray.length - oldArray.length;
 
     return diff + Math.floor((range.end - range.start)*.5);
-    // return diff + (diff / 2);
+  }
+
+  calculateScrollOffset(){
+    const bottomOffset = this.virtualViewport.measureScrollOffset("bottom");
+    const topOffset = this.virtualViewport.measureScrollOffset("top");
+
+    return topOffset;
   }
   
 
