@@ -4,11 +4,8 @@ import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
 import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { isNull } from '@angular/compiler/src/output/output_ast';
-import { ITS_JUST_ANGULAR } from '@angular/core/src/r3_symbols';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { ListRange } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-chat',
@@ -18,19 +15,19 @@ import { ListRange } from '@angular/cdk/collections';
 export class ChatComponent implements OnInit {
  
   
-  @ViewChildren('messages') private messageContainer: QueryList<ElementRef>;
-  @ViewChild(CdkVirtualScrollViewport) virtualMessages: CdkVirtualScrollViewport;
+  @ViewChildren('messages') private messageContainer: QueryList<Message>;
+  @ViewChild(CdkVirtualScrollViewport) virtualViewport: CdkVirtualScrollViewport;
   
   chatId: string;
   messages: Message[];
   currentUserId: string;
-  private isNotificationsOk: boolean;
+  
   private subscription: Subscription = new Subscription();
   private scrollUpSub: Subscription;
 
 
   private oldMessageObserve: PacedObservable<Message[]>;
-  private isScrolling: boolean;  
+  private isRefreshing: boolean;  
   private lastScrollIndex: number = Number.MIN_SAFE_INTEGER;
 
   constructor(
@@ -125,14 +122,14 @@ export class ChatComponent implements OnInit {
     this.messageContainer.changes
       .pipe(take(1))
       .subscribe({
-        next: (args) => { this.isScrolling = true; console.log("actually scrolls to: " + index);  this.virtualMessages.scrollToIndex(index); },
-        complete: () => { this.isScrolling = false; }
+        next: (args) => { this.isRefreshing = true; console.log("actually scrolls to: " + index);  this.virtualViewport.scrollToIndex(index); },
+        complete: () => { this.isRefreshing = false; }
       });
   }
 
   scrollToBottom = () => {
     try {
-      this.virtualMessages.scrollToIndex(this.messages.length - 1);
+      this.virtualViewport.scrollToIndex(this.messages.length - 1);
     } catch(error) {
       console.log(error);
     }  
@@ -161,19 +158,8 @@ export class ChatComponent implements OnInit {
   }
 
   onScrolled = (newIndex: number): void => {
-    console.log("changed index: " + newIndex);
-    if( newIndex > 10 || this.isScrolling){
-      return;
-    }
-    this.scrollUpSub.unsubscribe();
-    this.oldMessageObserve.run();
-  }
-
- onRangeChange = (range: ListRange): void => {
-    console.log("last index: " + this.lastScrollIndex);
-    console.log("changed range: " + range.start + " " + range.end);
-    if(!this.needsRefresh(this.lastScrollIndex, range.start) || this.isScrolling){
-      this.lastScrollIndex = range.start;
+    if(!this.needsRefresh(this.lastScrollIndex, newIndex) || this.isRefreshing){
+      this.lastScrollIndex = newIndex;
       return;
     }
     this.scrollUpSub.unsubscribe();
@@ -186,7 +172,7 @@ export class ChatComponent implements OnInit {
       return false;
     }
 
-    if(lastIndex - newIndex > 8){
+    if(lastIndex - newIndex > 4){
       return false;
     }
 
@@ -199,31 +185,42 @@ export class ChatComponent implements OnInit {
   }
 
   processOldMessages = (ms: Message[]): void => {
-    try{
-      if(ms == null || ms.length == 0) {
-        return;
-      }
-      const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+    if(ms == null || ms.length == 0) {
+      return;
+    }
+    const scrollIndex = this.calculateMessageIndex(this.messages, ms);
+    this.isRefreshing = true;
+    this.messages = ms;
+
+    const p = new Promise((resolve, reject) =>{
       setTimeout(() => {
-        this.virtualMessages.scrollToIndex(scrollIndex);
+        this.virtualViewport.scrollToIndex(scrollIndex);
+        this.isRefreshing = false;
+        resolve(null);
+        this.onScrollSubscribe();
       }, 100);
-      // this.scrollToOnce(scrollIndex);
-      this.messages = ms;
-    }
-    finally{
-      this.onScrollSubscribe();
-    }
+    });
   }
 
+  // messageTrackBy = (index: number, item: Message): any => {
+  //   if(this.scrollToChange === null || this.scrollToChange === undefined || this.updateCount < this.updateTarget){
+  //     this.updateCount++;
+  //     return;
+  //   }
+  // }
+
   calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
+    const range = this.virtualViewport.getRenderedRange();
     const diff = newArray.length - oldArray.length;
-    return diff + (diff / 2);
+
+    return diff + Math.floor((range.end - range.start)*.5);
+    // return diff + (diff / 2);
   }
   
 
   onScrollSubscribe(): void {
-    this.scrollUpSub = this.virtualMessages.renderedRangeStream
-      .subscribe({next: this.onRangeChange})
+    this.scrollUpSub = this.virtualViewport.scrolledIndexChange
+      .subscribe({next: this.onScrolled})
   }
 
 }
