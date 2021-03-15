@@ -188,13 +188,25 @@ export class ChatComponent implements OnInit {
     if(ms == null || ms.length == 0) {
       return;
     }
+    
     const offset = this.calculateScrollOffset();
+    const prevHeight = Number.parseInt(this.virtualViewport._totalContentHeight.substring(0, this.virtualViewport._totalContentHeight.length - 2));
     this.isRefreshing = true;
     this.messages = ms;
 
     const p = new Promise((resolve, reject) =>{
       setTimeout(() => {
-        this.virtualViewport.scrollToOffset(offset);
+        console.log("++++++++++++ SCROLL TIME++++++++++")
+        console.log("offset: " + offset);
+        const newHeight = this.parsePixels(this.virtualViewport._totalContentHeight);
+        // const scrollto = this.virtualViewport.getViewportSize() - bottomOffset;
+        // const scrollTo = (Number.parseInt(this.virtualViewport._totalContentHeight.substring(0, this.virtualViewport._totalContentHeight.length - 2)) - bottomOffset);
+        this.printMeasures();
+        // const scrollTo = this.virtualViewport.measureScrollOffset("top");
+        const scrollTo = offset + newHeight;
+        
+        console.log("scroll to: " + scrollTo);
+        this.virtualViewport.scrollToOffset(scrollTo);
         this.isRefreshing = false;
         resolve(null);
         this.onScrollSubscribe();
@@ -210,10 +222,30 @@ export class ChatComponent implements OnInit {
   }
 
   calculateScrollOffset(){
+    this.printMeasures();
+
     const bottomOffset = this.virtualViewport.measureScrollOffset("bottom");
     const topOffset = this.virtualViewport.measureScrollOffset("top");
+    const height = this.parsePixels(this.virtualViewport._totalContentHeight);
 
-    return topOffset;
+    return topOffset - height;
+  }
+
+  parsePixels(length: string){
+    return Number.parseInt(length.substring(0, length.length - 2))
+  }
+
+  printMeasures() {
+    console.log("------------");
+    console.log("content start: " + this.virtualViewport.getOffsetToRenderedContentStart());
+    console.log("total height: " + this.virtualViewport._totalContentHeight);
+
+    console.log("start: " + this.virtualViewport.measureScrollOffset("start"));
+    console.log("end: " + this.virtualViewport.measureScrollOffset("end"));
+    console.log("top: " + this.virtualViewport.measureScrollOffset("top"));
+    console.log("bottom: " + this.virtualViewport.measureScrollOffset("bottom"));
+    console.log("------------");
+
   }
   
 
