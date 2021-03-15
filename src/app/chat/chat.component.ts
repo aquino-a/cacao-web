@@ -188,39 +188,18 @@ export class ChatComponent implements OnInit {
     if(ms == null || ms.length == 0) {
       return;
     }
-    
-    const offset = this.calculateScrollOffset();
+    const bottomOffset = this.virtualViewport.measureScrollOffset("bottom");
     this.isRefreshing = true;
     this.messages = ms;
 
     const p = new Promise((resolve, reject) =>{
       setTimeout(() => {
-        this.printMeasures();
-        const newHeight = this.parsePixels(this.virtualViewport._totalContentHeight);
-        const scrollTo = newHeight - offset;
-        
-        console.log("scroll to: " + scrollTo);
-        this.virtualViewport.scrollToOffset(scrollTo);
+        this.virtualViewport.scrollTo({bottom: bottomOffset});
         this.isRefreshing = false;
         resolve(null);
         this.onScrollSubscribe();
       }, 150);
     });
-  }
-
-  calculateMessageIndex(oldArray: Message[], newArray: Message[]): number {
-    const range = this.virtualViewport.getRenderedRange();
-    const diff = newArray.length - oldArray.length;
-
-    return diff + Math.floor((range.end - range.start)*.5);
-  }
-
-  calculateScrollOffset(){
-    this.printMeasures();
-    const topOffset = this.virtualViewport.measureScrollOffset("top");
-    const height = this.parsePixels(this.virtualViewport._totalContentHeight);
-
-    return height - topOffset;
   }
 
   parsePixels(length: string){
