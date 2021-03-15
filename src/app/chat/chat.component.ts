@@ -49,7 +49,12 @@ export class ChatComponent implements OnInit {
         .subscribe(messages =>{
           this.messages = messages;
           this.messages.filter(m => !m.wasRead).forEach(m => this.read(m));
-          this.scrollToOnce(this.messages.length - 1);
+          this.messageContainer.changes
+            .pipe(take(1))
+            .subscribe({
+              next: (args) => this.virtualViewport.scrollTo({bottom: 0}),
+            });
+          ;
           this.onScrollSubscribe();
         });
     });
@@ -86,7 +91,7 @@ export class ChatComponent implements OnInit {
       return;
     }
 
-    this.scrollToOnce(this.messages.length - 1);
+    this.virtualViewport.scrollTo({bottom: -56});
     this.messages = [...this.messages, message];
     if(message.toUser == this.auth.currentUser.id){
       this.read(message);
