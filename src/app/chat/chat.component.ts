@@ -204,7 +204,7 @@ export class ChatComponent implements OnInit {
         this.isRefreshing = false;
         resolve(null);
         this.onScrollSubscribe();
-      }, 100);
+      }, 150);
     });
   }
 
