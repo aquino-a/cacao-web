@@ -190,20 +190,14 @@ export class ChatComponent implements OnInit {
     }
     
     const offset = this.calculateScrollOffset();
-    const prevHeight = Number.parseInt(this.virtualViewport._totalContentHeight.substring(0, this.virtualViewport._totalContentHeight.length - 2));
     this.isRefreshing = true;
     this.messages = ms;
 
     const p = new Promise((resolve, reject) =>{
       setTimeout(() => {
-        console.log("++++++++++++ SCROLL TIME++++++++++")
-        console.log("offset: " + offset);
-        const newHeight = this.parsePixels(this.virtualViewport._totalContentHeight);
-        // const scrollto = this.virtualViewport.getViewportSize() - bottomOffset;
-        // const scrollTo = (Number.parseInt(this.virtualViewport._totalContentHeight.substring(0, this.virtualViewport._totalContentHeight.length - 2)) - bottomOffset);
         this.printMeasures();
-        // const scrollTo = this.virtualViewport.measureScrollOffset("top");
-        const scrollTo = offset + newHeight;
+        const newHeight = this.parsePixels(this.virtualViewport._totalContentHeight);
+        const scrollTo = newHeight - offset;
         
         console.log("scroll to: " + scrollTo);
         this.virtualViewport.scrollToOffset(scrollTo);
@@ -223,12 +217,10 @@ export class ChatComponent implements OnInit {
 
   calculateScrollOffset(){
     this.printMeasures();
-
-    const bottomOffset = this.virtualViewport.measureScrollOffset("bottom");
     const topOffset = this.virtualViewport.measureScrollOffset("top");
     const height = this.parsePixels(this.virtualViewport._totalContentHeight);
 
-    return topOffset - height;
+    return height - topOffset;
   }
 
   parsePixels(length: string){
@@ -236,7 +228,9 @@ export class ChatComponent implements OnInit {
   }
 
   printMeasures() {
+    console.log("--");
     console.log("------------");
+    console.log("viewport size: " + this.virtualViewport.getViewportSize());
     console.log("content start: " + this.virtualViewport.getOffsetToRenderedContentStart());
     console.log("total height: " + this.virtualViewport._totalContentHeight);
 
@@ -245,6 +239,7 @@ export class ChatComponent implements OnInit {
     console.log("top: " + this.virtualViewport.measureScrollOffset("top"));
     console.log("bottom: " + this.virtualViewport.measureScrollOffset("bottom"));
     console.log("------------");
+    console.log("--");
 
   }
   
