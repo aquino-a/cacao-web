@@ -69,8 +69,13 @@
   .separator:not(:empty)::after {
     margin-left: .25em;
   }
-  .from-user-image{
+  
+  .from-user-image {
       width: 2em;
       border-radius: .2em;
       margin: 0;
+  }
+
+  .time {
+    font-size: smaller;
   }

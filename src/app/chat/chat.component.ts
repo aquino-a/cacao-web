@@ -178,19 +178,15 @@ export class ChatComponent implements OnInit {
     else return current.time.getMinutes() != next.time.getMinutes();
   }
 
-  // requiresImg(index: number): boolean {
-
-  // }
-
-
   /**
-   *  Returns null if doesn't need photo based on time and if it's the from user
+   * Returns null if doesn't need photo based on time and if it's the from user
    *
    * @param {number} index
    * @param {string} id
+   * @return {*}  {string}
    * @memberof ChatComponent
    */
-  getFriendPhoto(index: number, id: string) {
+  getFriendPhoto(index: number, id: string): string {
     if(id === this.auth.currentUser.id) {
       return null;
     }
