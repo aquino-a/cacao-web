@@ -2,6 +2,7 @@
     <div *ngIf='isNewDate' class="separator">{{message.time.toLocaleDateString()}}</div>
     <div class="col" style="padding-right: 5px; padding-left: 5px; margin-top: 1px;">
         <div [class.message-wrapper-user]='isUser'>
+            <img *ngIf='!isUser' class="message-child from-user-image" src="{{fromUserImgSrc}}" />
             <label *ngIf='isUser && isNewTime' class="message-child">{{message.time.toLocaleTimeString()}}</label>
             <div class="message message-child" [class.myMessage]='isUser' [class.otherMessage]='!isUser'>
                 <p style="margin: 0px;">{{message.message}}</p>

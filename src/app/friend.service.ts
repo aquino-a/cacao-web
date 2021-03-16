@@ -11,7 +11,7 @@ import { User } from './user';
 export class FriendService {
   
   friends: Friend[] = [];
-  friendIdSet: Set<string> = new Set<string>();
+  friendSet: Map<string, User> = new Map<string, User>();
   
   constructor(private http: HttpClient) {
   }
@@ -19,9 +19,9 @@ export class FriendService {
   fetchFriendList(): Friend[] {
     const ob = this.http.get<User[]>(environment.baseUrl + "/api/friends")
         .pipe(map(users => 
-          users.filter(u => !this.friendIdSet.has(u.id))
+          users.filter(u => !this.friendSet.has(u.id))
             .map(u => {
-              this.friendIdSet.add(u.id);
+              this.friendSet.set(u.id, u);
               return { user: u, unreadMessages: 0 };
             }
         )));
@@ -34,6 +34,13 @@ export class FriendService {
     const ob = this.http.post(environment.baseUrl + "/api/friend/add", null, options);
     ob.subscribe(data => console.log(data), error => console.log(error));
     return ob;
+  }
+
+  getFriendPhoto(id: string): string {
+    if(!this.friendSet.has(id)){
+      return "PHOTO";
+    }
+    else return this.friendSet.get(id).imgUrl;
   }
   
 }

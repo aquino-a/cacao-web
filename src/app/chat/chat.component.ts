@@ -6,7 +6,18 @@ import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { FriendService } from '../friend.service';
 
+
+/**
+ * Handles all chat functions.
+ * Displays messages.
+ * Accepts new message input.
+ * 
+ * @export
+ * @class ChatComponent
+ * @implements {OnInit}
+ */
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -33,7 +44,8 @@ export class ChatComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private messageService: MessageService,
-    private auth: AuthenticationService
+    private auth: AuthenticationService,
+    private friendService: FriendService
     ) { 
       auth.userLoginSuccess$.subscribe({next: user => this.currentUserId = user.id});
       auth.userLoginFail$.subscribe({next: nothing => this.currentUserId = null});
@@ -141,7 +153,7 @@ export class ChatComponent implements OnInit {
   }
 
   isNewDate(index: number) : boolean {
-    if(index == 0){
+    if(index <= 0){
       return true;
     }
     var before = this.messages[index - 1];
@@ -153,6 +165,10 @@ export class ChatComponent implements OnInit {
       return true;
     }
 
+    if(index <= 0){
+      return true;
+    }
+
     var current = this.messages[index];
     var next = this.messages[index + 1];
 
@@ -160,6 +176,30 @@ export class ChatComponent implements OnInit {
       return true;
     }
     else return current.time.getMinutes() != next.time.getMinutes();
+  }
+
+  // requiresImg(index: number): boolean {
+
+  // }
+
+
+  /**
+   *  Returns null if doesn't need photo based on time and if it's the from user
+   *
+   * @param {number} index
+   * @param {string} id
+   * @memberof ChatComponent
+   */
+  getFriendPhoto(index: number, id: string) {
+    if(id === this.auth.currentUser.id) {
+      return null;
+    }
+
+    if(!this.isNewTime(index - 1)){
+      return null;
+    }
+    
+    return this.friendService.getFriendPhoto(id);
   }
 
   onScrolled = (newIndex: number): void => {
@@ -245,15 +285,27 @@ export class MessageComponent {
   @Input() isUser: boolean;
   @Input() isNewDate: boolean = true;
   @Input() isNewTime: boolean = true;
+  @Input() fromUserImgSrc: string;
 }
 
+/**
+ * Encapsulates running an observable only once at the same time.
+ *
+ * @class PacedObservable
+ * @template T
+ */
 class PacedObservable<T> {
 
   private readonly obFactory: () => Observable<T>;
   private readonly subNext: (t: T) => void;
   private isRunning: boolean;
-
-  constructor(obFactory: () => Observable<T>, subNext: (t: T) => void) {
+/**
+ * Creates an instance of PacedObservable.
+ * @param {() => Observable<T>} obFactory
+ * @param {(t: T) => void} subNext
+ * @memberof PacedObservable
+ */
+constructor(obFactory: () => Observable<T>, subNext: (t: T) => void) {
     this.obFactory = obFactory;
     this.subNext = subNext;
   }
