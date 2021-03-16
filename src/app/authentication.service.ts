@@ -6,7 +6,13 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { isNull, ThrowStmt } from '@angular/compiler/src/output/output_ast';
 import { Router } from '@angular/router';
 
-
+/**
+ * Responsible for handling all tasks related to Authentication.
+ * Keeps track of current user and tokens.
+ *
+ * @export
+ * @class AuthenticationService
+ */
 @Injectable({
   providedIn: 'root'
 })

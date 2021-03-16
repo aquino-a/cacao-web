@@ -3,6 +3,13 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Rout
 import { Observable } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 
+/**
+ * Protects secure areas
+ *
+ * @export
+ * @class AuthGuard
+ * @implements {CanActivate}
+ */
 @Injectable({
   providedIn: 'root'
 })

@@ -5,6 +5,15 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { User } from './user';
 
+/**
+ * Responsible for tasks related to Friends.
+ * Adds friends.
+ * Retrieves friend list.
+ * Caches friend list.
+ *
+ * @export
+ * @class FriendService
+ */
 @Injectable({
   providedIn: 'root'
 })

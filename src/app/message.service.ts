@@ -9,6 +9,16 @@ import { map } from 'rxjs/operators';
 import { AuthenticationService } from './authentication.service';
 import { User } from './user';
 
+/**
+ * Responsible for all tasks related to messages.
+ * Sends and Receives new messages using stompjs (websocket)
+ * Caches the messages.
+ * Publishes new message, connect, and disconnect events.
+ * 
+ * 
+ * @export
+ * @class MessageService
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -39,7 +49,7 @@ export class MessageService {
     this.auth.userLoginFail$.subscribe({next: nothing => { this.stompClient.forceDisconnect(); this.stompClient.deactivate(); }});
   }
 
-  createStompClient(): void {
+  private createStompClient(): void {
     if(!this.auth.isAuthenticated())
       return;
       
@@ -60,14 +70,14 @@ export class MessageService {
     this.stompClient.activate();
   }
 
-  onConnect = (frame: IFrame) => {
+  private onConnect = (frame: IFrame) => {
     // console.log('Connected: ' + frame);
     this.setConnected(true);
     this.stompClient.subscribe('/user/api/topic/message', this.processNewMessage);
     this.connectedSource.next({});
   }
 
-  onStompError = (frame: IFrame) => {
+  private onStompError = (frame: IFrame) => {
       // Will be invoked in case of error encountered at Broker
       // Bad login/passcode typically will cause an error
       // Complaint brokers will set `message` header with a brief message. Body may contain details.
@@ -76,11 +86,11 @@ export class MessageService {
       console.log('Additional details: ' + frame.body);
   }
 
-  onClose = (evt: CloseEvent) => {
+  private onClose = (evt: CloseEvent) => {
     this.disconnectedSource.next({});
   }
 
-  processNewMessage = (data: any) => {
+  private processNewMessage = (data: any) => {
     const message = JSON.parse(data.body, this.messageParse) as Message;
     
     this.newMessageSource.next(message);
@@ -97,7 +107,7 @@ export class MessageService {
     else this.messages.set(chatId, new Messages([message], new Set<string>().add(message.id)));
   }
 
-  notify(message: Message) {
+  private notify(message: Message) {
     if(message.toUser != this.auth.currentUser.id) {
       return;
     }
@@ -111,7 +121,7 @@ export class MessageService {
     });
   }
 
-  getChatId(message: Message): string {
+  private getChatId(message: Message): string {
     if(message.fromUser == this.auth.currentUser.id){
       return message.toUser;
     } else {
@@ -119,19 +129,26 @@ export class MessageService {
     }
   }
 
-  messageParse(key: any, value: any) {
+  private messageParse(key: any, value: any) {
     if(key == 'time'){
       return new Date(value + 'Z');
     }
     return value;
   }
 
-  setConnected(isConnected: boolean) {
+  private setConnected(isConnected: boolean) {
     if(isConnected)
       console.log('Connected');
   }
   
-  fetchMessages(chatId: string): Observable<Message[]> {
+  /**
+   * Gets messages for a chat.  Returns from cache if available.
+   *
+   * @param {string} chatId
+   * @return {*}  {Observable<Message[]>}
+   * @memberof MessageService
+   */
+  public fetchMessages(chatId: string): Observable<Message[]> {
     if(this.messages.has(chatId)){
       const ms = this.messages.get(chatId);
       if(!ms.messages.every(m => !m.wasRead)){
@@ -157,7 +174,7 @@ export class MessageService {
     return pipedOb;
   }
 
-  setMessages(chatId: string, ms: Message[]) {
+  private setMessages(chatId: string, ms: Message[]) {
     var messages = this.messages.get(chatId);
 
     if(messages == null || messages == undefined){
@@ -172,7 +189,14 @@ export class MessageService {
     this.messages.set(chatId, messages);
   }
 
-  send(toUser: string, newMessage: string) {
+  /**
+   * Send a message to the server.
+   *
+   * @param {string} toUser
+   * @param {string} newMessage
+   * @memberof MessageService
+   */
+  public send(toUser: string, newMessage: string) {
     var message = {
       toUser: toUser,
       message: newMessage
@@ -186,7 +210,13 @@ export class MessageService {
     this.stompClient.publish(params);
   }
 
-  readMessage(message: Message) {
+  /**
+   * Tells server that a message has been read.
+   *
+   * @param {Message} message
+   * @memberof MessageService
+   */
+  public readMessage(message: Message) {
     var params = {
       destination: "/api/app/message/read",
       body: message.id
@@ -195,7 +225,14 @@ export class MessageService {
     message.wasRead = true;
   }
 
-  unreadMessageCount(user: User): number {
+  /**
+   * Gets amount of unread messsages from cache.
+   *
+   * @param {User} user
+   * @return {*}  {number}
+   * @memberof MessageService
+   */
+  public unreadMessageCount(user: User): number {
     const messages = this.messages.get(user.id);
     
     if(messages == null || messages == undefined){
@@ -204,7 +241,15 @@ export class MessageService {
     return messages.messages.filter(m => !m.wasRead && m.fromUser == user.id).length;
   }
 
-  isDuplicateMessage(chatId: string, messageId: string): boolean {
+  /**
+   * Checks if message is a duplicate in a certain chat.
+   *
+   * @param {string} chatId
+   * @param {string} messageId
+   * @return {*}  {boolean}
+   * @memberof MessageService
+   */
+  public isDuplicateMessage(chatId: string, messageId: string): boolean {
     const messages = this.messages.get(chatId);
     
     if(messages == null || messages == undefined){
@@ -214,7 +259,14 @@ export class MessageService {
     return messages.messageIds.has(messageId);
   }
 
-  fetchOldMessages(chatId: string): Observable<Message[]> {
+  /**
+   * Gets the next set of older messages. 
+   *
+   * @param {string} chatId
+   * @return {*}  {Observable<Message[]>}
+   * @memberof MessageService
+   */
+  public fetchOldMessages(chatId: string): Observable<Message[]> {
 
     const messages = this.messages.get(chatId);
 
@@ -247,11 +299,11 @@ export class MessageService {
     return pipedOb;
   }
 
-  updateStringDate(message: Message): void {
+  private updateStringDate(message: Message): void {
     message.time = new Date(message.time + 'Z');
   }
 
-  sortMessages(message1: Message, message2: Message): number {
+  private sortMessages(message1: Message, message2: Message): number {
     return message1.time.getTime() - message2.time.getTime();
   }
  
