@@ -2,7 +2,12 @@
 ## _Messaging App_
 
 
-Cacao is a clone of a Korean chat app called Kakao. This is the front end of the application. It was created using Angular 10.
+Cacao is a clone of a Korean chat app called Kakao.
+ This is the front end of the application. 
+ It was created using [Angular 10](),
+ [StompJS](https://github.com/stomp-js/stompjs), and
+ [Bootstrap](https://getbootstrap.com/docs/4.6/getting-started/introduction/). 
+ You can find the back end [here][back end].
 
 ## Features
 
