@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
-import { isNullOrUndefined } from 'util';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -18,7 +17,7 @@ export class LoginComponent implements OnInit {
 
     this.activatedRoute.queryParams.subscribe(params => {
           let code = params['code'];
-          if(!isNullOrUndefined(code)){
+          if(code !== null && code !== undefined){
             console.log(code); // Print the parameter to the console. 
             this.authenticationService.authenticate(code);
           }

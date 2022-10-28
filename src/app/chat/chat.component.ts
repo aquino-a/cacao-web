@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ElementRef, QueryList, ViewChildren, ViewChil
 import { ActivatedRoute } from '@angular/router';
 import { MessageService, Message } from '../message.service';
 import { AuthenticationService } from '../authentication.service';
-import { isDefined, stringify } from '@angular/compiler/src/util';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -91,7 +90,7 @@ export class ChatComponent implements OnInit {
   }
 
   newMessage = (message: Message) => {
-    if(!isDefined(this.messages) || !isDefined(message)){ 
+    if(this.messages === undefined || message === undefined){ 
       return;  
     }
 
