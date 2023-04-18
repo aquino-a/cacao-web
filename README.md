@@ -2,7 +2,7 @@
 ## _Messaging App_
 
 
-Cacao is a clone of a Korean chat app called Kakao.
+Cacao is a messaging app inspired by the Korean chat app, Kakao.
  This is the front end of the application. 
  It was created using [Angular 10](),
  [StompJS](https://github.com/stomp-js/stompjs), and
